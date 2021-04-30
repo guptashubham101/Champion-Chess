@@ -1329,349 +1329,521 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 					y[i+1][j+1]=6
 		if j == 6 and i-1>-1:
 			if x[i-1][j+1]%2 == 1:
-				f = checkparticularB(i,j+1)
+				f = checkparticularB(i-1,j+1)
 				if f == 1:
 					y[i][j+1]=6
 
 	if x[i][j] == 1:
 		if y[i][j-1] == 0 and x[i][j-1] == 0:
-			y[i][j-1]=1
+			f = checkparticularW(i,j-1)
+			if f == 1:
+				y[i][j-1]=1
 		if j == 6 and y[i][j-2] == 0 and x[i][j-2] == 0:
-			y[i][j-2]=1
+			f = checkparticularW(i,j-2)
+			if f == 1:
+				y[i][j-2]=1
 		if i-1>-1:
 			if x[i-1][j-1]%2 == 0 and x[i-1][j-1] > 0:
-				y[i-1][j-1]=1
+				f = checkparticularW(i-1,j-1)
+				if f == 1:
+					y[i-1][j-1]=1
 		if i < 7:
 			if x[i+1][j-1]%2 == 0 and x[i+1][j-1] > 0:
-				y[i+1][j-1]=1
+				f = checkparticularW(i+1,j-1)
+				if f == 1:
+					y[i+1][j-1]=1
 		if j == 1 and x[i][j-1] == 0:
-			y[i][j-1]=7
+			f = checkparticularW(i,j-1)
+			if f == 1:
+				y[i][j-1]=7
 		if j == 1 and i+1<8:
 			if x[i+1][j-1]%2 == 0 and x[i+1][j-1] > 0:
-				y[i+1][j-1]=7
+				f = checkparticularW(i+1,j-1)
+				if f == 1:
+					y[i+1][j-1]=7
 		if j == 1 and i-1>-1:
 			if x[i-1][j-1]%2 == 0 and x[i-1][j-1] > 0:
-				y[i-1][j-1]=7
+				f = checkparticularW(i-1,j-1)
+				if f == 1:
+					y[i-1][j-1]=7
 
 	if x[i][j] == 6:
 		if i-1>=0 and j+2<=7:
 			if (y[i-1][j+2] == 0 or x[i-1][j+2]%2 == 1) and (x[i-1][j+2]%2 != 0 or x[i-1][j+2] == 0):
-				y[i-1][j+2]=1
+				f = checkparticularB(i-1,j+2)
+				if f == 1:
+					y[i-1][j+2]=1
 		if i+1<=7 and j+2<=7:
 			if (y[i+1][j+2] == 0 or x[i+1][j+2]%2 == 1) and (x[i+1][j+2]%2 != 0 or x[i+1][j+2] == 0):
-				y[i+1][j+2]=1
+				f = checkparticularB(i+1,j+2)
+				if f == 1:
+					y[i+1][j+2]=1
 		if i-2>=0 and j+1<=7:
 			if (y[i-2][j+1] == 0 or x[i-2][j+1]%2 == 1) and (x[i-2][j+1]%2 != 0 or x[i-2][j+1] == 0):
-				y[i-2][j+1]=1
+				f = checkparticularB(i-2,j+1)
+				if f == 1:
+					y[i-2][j+1]=1
 		if i+2<=7 and j+1<=7:
 			if (y[i+2][j+1] == 0 or x[i+2][j+1]%2 == 1) and (x[i+2][j+1]%2 != 0 or x[i+2][j+1] == 0):
-				y[i+2][j+1]=1
+				f = checkparticularB(i+2,j+1)
+				if f == 1:
+					y[i+2][j+1]=1
 		if i-1>=0 and j-2>=0:
 			if (y[i-1][j-2] == 0 or x[i-1][j-2]%2 == 1) and (x[i-1][j-2]%2 != 0 or x[i-1][j-2] == 0):
-				y[i-1][j-2]=1
+				f = checkparticularB(i-1,j-2)
+				if f == 1:
+					y[i-1][j-2]=1
 		if i+1<=7 and j-2>=0:
 			if (y[i+1][j-2] == 0 or x[i+1][j-2]%2 == 1) and (x[i+1][j-2]%2 != 0 or x[i+1][j-2] == 0):
-				y[i+1][j-2]=1
+				f = checkparticularB(i+1,j-2)
+				if f == 1:
+					y[i+1][j-2]=1
 		if i-2>=0 and j-1>=0:
 			if (y[i-2][j-1] == 0 or x[i-2][j-1]%2 == 1) and (x[i-2][j-1]%2 != 0 or x[i-2][j-1] == 0):
-				y[i-2][j-1]=1
+				f = checkparticularB(i-2,j-1)
+				if f == 1:
+					y[i-2][j-1]=1
 		if i+2<=7 and j-1>=0:
 			if (y[i+2][j-1] == 0 or x[i+2][j-1]%2 == 1) and (x[i+2][j-1]%2 != 0 or x[i+2][j-1] == 0):
-				y[i+2][j-1]=1
+				f = checkparticularB(i+2,j-1)
+				if f == 1:
+					y[i+2][j-1]=1
 
 	if x[i][j] == 5:
 		if i-1>=0 and j+2<=7:
 			if (y[i-1][j+2] == 0 or x[i-1][j+2]%2 == 0) and (x[i-1][j+2]%2 != 1 or x[i-1][j+2] == 0):
-				y[i-1][j+2]=1
+				f = checkparticularW(i-1,j+2)
+				if f == 1:
+					y[i-1][j+2]=1
 		if i+1<=7 and j+2<=7:
 			if (y[i+1][j+2] == 0 or x[i+1][j+2]%2 == 0) and (x[i+1][j+2]%2 != 1 or x[i+1][j+2] == 0):
-				y[i+1][j+2]=1
+				f = checkparticularW(i+1,j+2)
+				if f == 1:
+					y[i+1][j+2]=1
 		if i-2>=0 and j+1<=7:
 			if (y[i-2][j+1] == 0 or x[i-2][j+1]%2 == 0) and (x[i-2][j+1]%2 != 1 or x[i-2][j+1] == 0):
-				y[i-2][j+1]=1
+				f = checkparticularW(i-2,j+1)
+				if f == 1:
+					y[i-2][j+1]=1
 		if i+2<=7 and j+1<=7:
 			if (y[i+2][j+1] == 0 or x[i+2][j+1]%2 == 0) and (x[i+2][j+1]%2 != 1 or x[i+2][j+1] == 0):
-				y[i+2][j+1]=1
+				f = checkparticularW(i+2,j+1)
+				if f == 1:
+					y[i+2][j+1]=1
 		if i-1>=0 and j-2>=0:
 			if (y[i-1][j-2] == 0 or x[i-1][j-2]%2 == 0) and (x[i-1][j-2]%2 != 1 or x[i-1][j-2] == 0):
-				y[i-1][j-2]=1
+				f = checkparticularW(i-1,j-2)
+				if f == 1:
+					y[i-1][j-2]=1
 		if i+1<=7 and j-2>=0:
 			if (y[i+1][j-2] == 0 or x[i+1][j-2]%2 == 0) and (x[i+1][j-2]%2 != 1 or x[i+1][j-2] == 0):
-				y[i+1][j-2]=1
+				f = checkparticularW(i+1,j-2)
+				if f == 1:
+					y[i+1][j-2]=1
 		if i-2>=0 and j-1>=0:
 			if (y[i-2][j-1] == 0 or x[i-2][j-1]%2 == 0) and (x[i-2][j-1]%2 != 1 or x[i-2][j-1] == 0):
-				y[i-2][j-1]=1
+				f = checkparticularW(i-2,j-1)
+				if f == 1:
+					y[i-2][j-1]=1
 		if i+2<=7 and j-1>=0:
 			if (y[i+2][j-1] == 0 or x[i+2][j-1]%2 == 0) and (x[i+2][j-1]%2 != 1 or x[i+2][j-1] == 0):
-				y[i+2][j-1]=1
+				f = checkparticularW(i+2,j-1)
+				if f == 1:
+					y[i+2][j-1]=1
 
 	if x[i][j] == 4:
 		for p in range(1,8):
 			if 	j+p<8 and x[i][j+p] == 0:
-				y[i][j+p] = 1
+				f = checkparticularB(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
 			if j+p<8 and x[i][j+p]%2 == 1:
-				y[i][j+p] = 1
-				break
+				f = checkparticularB(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
+					break
 			if j+p<8 and x[i][j+p]%2 == 0 and x[i][j+p] > 0:
 				break
 		for p in range(1,8):
 			if 	j-p>-1 and x[i][j-p] == 0:
-				y[i][j-p] = 1
+				f = checkparticularB(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
 			if j-p>-1 and x[i][j-p]%2 == 1:
-				y[i][j-p] = 1
-				break
+				f = checkparticularB(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
+					break
 			if j-p>-1 and x[i][j-p]%2 == 0 and x[i][j-p] > 0:
 				break
 		for p in range(1,8):
 			if 	i+p<8 and x[i+p][j] == 0:
-				y[i+p][j] = 1
+				f = checkparticularB(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
 			if i+p<8 and x[i+p][j]%2 == 1:
-				y[i+p][j] = 1
-				break
+				f = checkparticularB(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
+					break
 			if i+p<8 and x[i+p][j]%2 == 0 and x[i+p][j] > 0:
 				break
 		for p in range(1,8):
 			if 	i-p>-1 and x[i-p][j] == 0:
-				y[i-p][j] = 1
+				f = checkparticularB(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
 			if i-p>-1 and x[i-p][j]%2 == 1:
-				y[i-p][j] = 1
-				break
+				f = checkparticularB(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
+					break
 			if i-p>-1 and x[i-p][j]%2 == 0 and x[i-p][j] > 0:
 				break
 
 	if x[i][j] == 3:
 		for p in range(1,8):
 			if 	j+p<8 and x[i][j+p] == 0:
-				y[i][j+p] = 1
+				f = checkparticularW(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
 			if j+p<8 and x[i][j+p]%2 == 0 and x[i][j+p] > 0:
-				y[i][j+p] = 1
-				break
+				f = checkparticularW(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
+					break
 			if j+p<8 and x[i][j+p]%2 == 1:
 				break
 		for p in range(1,8):
 			if 	j-p>-1 and x[i][j-p] == 0:
-				y[i][j-p] = 1
+				f = checkparticularW(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
 			if j-p>-1 and x[i][j-p]%2 == 0 and x[i][j-p] > 0:
-				y[i][j-p] = 1
-				break
+				f = checkparticularW(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
+					break
 			if j-p>-1 and x[i][j-p]%2 == 1:
 				break
 		for p in range(1,8):
 			if 	i+p<8 and x[i+p][j] == 0:
-				y[i+p][j] = 1
+				f = checkparticularW(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
 			if i+p<8 and x[i+p][j]%2 == 0 and x[i+p][j] > 0:
-				y[i+p][j] = 1
-				break
+				f = checkparticularW(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
+					break
 			if i+p<8 and x[i+p][j]%2 == 1:
 				break
 		for p in range(1,8):
 			if 	i-p>-1 and x[i-p][j] == 0:
-				y[i-p][j] = 1
+				f = checkparticularW(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
 			if i-p>-1 and x[i-p][j]%2 == 0 and x[i-p][j] > 0:
-				y[i-p][j] = 1
-				break
+				f = checkparticularW(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
+					break
 			if i-p>-1 and x[i-p][j]%2 == 1:
 				break
 
 	if x[i][j] == 8:
 		for p in range(1,8):
 			if 	j+p<8 and i+p<8 and x[i+p][j+p] == 0:
-				y[i+p][j+p] = 1
+				f = checkparticularB(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
 			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 1:
-				y[i+p][j+p] = 1
-				break
+				f = checkparticularB(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
+					break
 			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 0 and x[i+p][j+p] > 0:
 				break
 		for p in range(1,8):
 			if 	i-p>-1 and j-p>-1 and x[i-p][j-p] == 0:
-				y[i-p][j-p] = 1
+				f = checkparticularB(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
 			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 1:
-				y[i-p][j-p] = 1
-				break
+				f = checkparticularB(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
+					break
 			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 0 and x[i-p][j-p] > 0:
 				break
 		for p in range(1,8):
 			if 	i+p<8 and j-p>-1 and x[i+p][j-p] == 0:
-				y[i+p][j-p] = 1
+				f = checkparticularB(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
 			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 1:
-				y[i+p][j-p] = 1
-				break
+				f = checkparticularB(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
+					break
 			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 0 and x[i+p][j-p] > 0:
 				break
 		for p in range(1,8):
 			if 	i-p>-1 and j+p<8 and x[i-p][j+p] == 0:
-				y[i-p][j+p] = 1
+				f = checkparticularB(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
 			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 1:
-				y[i-p][j+p] = 1
-				break
+				f = checkparticularB(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
+					break
 			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 0 and x[i-p][j+p] > 0:
 				break
 
 	if x[i][j] == 7:
 		for p in range(1,8):
 			if 	j+p<8 and i+p<8 and x[i+p][j+p] == 0:
-				y[i+p][j+p] = 1
+				f = checkparticularW(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
 			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 0 and x[i+p][j+p] > 0:
-				y[i+p][j+p] = 1
-				break
+				f = checkparticularW(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
+					break
 			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 1:
 				break
 		for p in range(1,8):
 			if 	j-p>-1 and i-p>-1 and x[i-p][j-p] == 0:
-				y[i-p][j-p] = 1
+				f = checkparticularW(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
 			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 0 and x[i-p][j-p] > 0:
-				y[i-p][j-p] = 1
-				break
+				f = checkparticularW(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
+					break
 			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 1:
 				break
 		for p in range(1,8):
 			if 	i+p<8 and j-p>-1 and x[i+p][j-p] == 0:
-				y[i+p][j-p] = 1
+				f = checkparticularW(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
 			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 0 and x[i+p][j-p] > 0:
-				y[i+p][j-p] = 1
-				break
+				f = checkparticularW(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
+					break
 			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 1:
 				break
 		for p in range(1,8):
 			if 	i-p>-1 and j+p<8 and x[i-p][j+p] == 0:
-				y[i-p][j+p] = 1
+				f = checkparticularW(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
 			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 0 and x[i-p][j+p] > 0:
-				y[i-p][j+p] = 1
-				break
+				f = checkparticularW(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
+					break
 			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 1:
 				break
 
 	if x[i][j] == 10:
 		for p in range(1,8):
 			if 	j+p<8 and i+p<8 and x[i+p][j+p] == 0:
-				y[i+p][j+p] = 1
+				f = checkparticularB(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
 			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 1:
-				y[i+p][j+p] = 1
-				break
+				f = checkparticularB(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
+					break
 			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 0 and x[i+p][j+p] > 0:
 				break
 		for p in range(1,8):
 			if 	i-p>-1 and j-p>-1 and x[i-p][j-p] == 0:
-				y[i-p][j-p] = 1
+				f = checkparticularB(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
 			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 1:
-				y[i-p][j-p] = 1
-				break
+				f = checkparticularB(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
+					break
 			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 0 and x[i-p][j-p] > 0:
 				break
 		for p in range(1,8):
 			if 	i+p<8 and j-p>-1 and x[i+p][j-p] == 0:
-				y[i+p][j-p] = 1
+				f = checkparticularB(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
 			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 1:
-				y[i+p][j-p] = 1
-				break
+				f = checkparticularB(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
+					break
 			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 0 and x[i+p][j-p] > 0:
 				break
 		for p in range(1,8):
 			if 	i-p>-1 and j+p<8 and x[i-p][j+p] == 0:
-				y[i-p][j+p] = 1
+				f = checkparticularB(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
 			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 1:
-				y[i-p][j+p] = 1
-				break
+				f = checkparticularB(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
+					break
 			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 0 and x[i-p][j+p] > 0:
 				break
 		for p in range(1,8):
 			if 	j+p<8 and x[i][j+p] == 0:
-				y[i][j+p] = 1
+				f = checkparticularB(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
 			if j+p<8 and x[i][j+p]%2 == 1:
-				y[i][j+p] = 1
-				break
+				f = checkparticularB(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
+					break
 			if j+p<8 and x[i][j+p]%2 == 0 and x[i][j+p] > 0:
 				break
 		for p in range(1,8):
 			if 	j-p>-1 and x[i][j-p] == 0:
-				y[i][j-p] = 1
+				f = checkparticularB(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
 			if j-p>-1 and x[i][j-p]%2 == 1:
-				y[i][j-p] = 1
-				break
+				f = checkparticularB(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
+					break
 			if j-p>-1 and x[i][j-p]%2 == 0 and x[i][j-p] > 0:
 				break
 		for p in range(1,8):
 			if 	i+p<8 and x[i+p][j] == 0:
-				y[i+p][j] = 1
+				f = checkparticularB(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
 			if i+p<8 and x[i+p][j]%2 == 1:
-				y[i+p][j] = 1
-				break
+				f = checkparticularB(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
+					break
 			if i+p<8 and x[i+p][j]%2 == 0 and x[i+p][j] > 0:
 				break
 		for p in range(1,8):
 			if 	i-p>-1 and x[i-p][j] == 0:
-				y[i-p][j] = 1
+				f = checkparticularB(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
 			if i-p>-1 and x[i-p][j]%2 == 1:
-				y[i-p][j] = 1
-				break
+				f = checkparticularB(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
+					break
 			if i-p>-1 and x[i-p][j]%2 == 0 and x[i-p][j] > 0:
 				break
 
 	if x[i][j] == 9:
 		for p in range(1,8):
 			if 	j+p<8 and i+p<8 and x[i+p][j+p] == 0:
-				f = checkparticularB(i+1,j+1)
+				f = checkparticularW(i+p,j+p)
 				if f == 1:
 					y[i+p][j+p] = 1
 			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 0 and x[i+p][j+p] > 0:
-				y[i+p][j+p] = 1
-				break
+				f = checkparticularW(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
+					break
 			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 1:
 				break
 		for p in range(1,8):
 			if 	j-p>-1 and i-p>-1 and x[i-p][j-p] == 0:
-				y[i-p][j-p] = 1
+				f = checkparticularW(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
 			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 0 and x[i-p][j-p] > 0:
-				y[i-p][j-p] = 1
-				break
+				f = checkparticularW(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
+					break
 			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 1:
 				break
 		for p in range(1,8):
 			if 	i+p<8 and j-p>-1 and x[i+p][j-p] == 0:
-				y[i+p][j-p] = 1
-			if i+p<8 and j-p>-1 and x[i+p][j-1]%2 == 0 and x[i+p][j-p] > 0:
-				y[i+p][j-p] = 1
-				break
+				f = checkparticularW(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
+			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 0 and x[i+p][j-p] > 0:
+				f = checkparticularW(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
+					break
 			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 1:
 				break
 		for p in range(1,8):
 			if 	i-p>-1 and j+p<8 and x[i-p][j+p] == 0:
-				y[i-p][j+p] = 1
+				f = checkparticularW(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
 			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 0 and x[i-p][j+p] > 0:
-				y[i-p][j+p] = 1
-				break
+				f = checkparticularW(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
+					break
 			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 1:
 				break
 		for p in range(1,8):
 			if 	j+p<8 and x[i][j+p] == 0:
-				y[i][j+p] = 1
+				f = checkparticularW(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
 			if j+p<8 and x[i][j+p]%2 == 0 and x[i][j+p] > 0:
-				y[i][j+p] = 1
-				break
+				f = checkparticularW(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
+					break
 			if j+p<8 and x[i][j+p]%2 == 1:
 				break
 		for p in range(1,8):
 			if 	j-p>-1 and x[i][j-p] == 0:
-				y[i][j-p] = 1
+				f = checkparticularW(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
 			if j-p>-1 and x[i][j-p]%2 == 0 and x[i][j-p] > 0:
-				y[i][j-p] = 1
-				break
+				f = checkparticularW(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
+					break
 			if j-p>-1 and x[i][j-p]%2 == 1:
 				break
 		for p in range(1,8):
 			if 	i+p<8 and x[i+p][j] == 0:
-				y[i+p][j] = 1
+				f = checkparticularW(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
 			if i+p<8 and x[i+p][j]%2 == 0 and x[i+p][j] > 0:
-				y[i+p][j] = 1
-				break
+				f = checkparticularW(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
+					break
 			if i+p<8 and x[i+p][j]%2 == 1:
 				break
 		for p in range(1,8):
 			if 	i-p>-1 and x[i-p][j] == 0:
-				y[i-p][j] = 1
+				f = checkparticularW(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
 			if i-p>-1 and x[i-p][j]%2 == 0 and x[i-p][j] > 0:
-				y[i-p][j] = 1
-				break
+				f = checkparticularW(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
+					break
 			if i-p>-1 and x[i-p][j]%2 == 1:
 				break
 
