@@ -189,7 +189,7 @@ def main():
 				l = i
 				m = j
 				piece = x[i][j]
-				getAvailableDerived(x, i,j,x1,y1,x2,y2)
+				getAvailable(x, i,j,x1,y1,x2,y2)
 				showAvailable()
 				x[i][j]=0
 				selected = 1
@@ -692,9 +692,7 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 	if x[i][j] == 9:
 		for p in range(1,8):
 			if 	j+p<8 and i+p<8 and x[i+p][j+p] == 0:
-				f = checkparticularB(i+1,j+1)
-				if f == 1:
-					y[i+p][j+p] = 1
+				y[i+p][j+p] = 1
 			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 0 and x[i+p][j+p] > 0:
 				y[i+p][j+p] = 1
 				break
@@ -1461,7 +1459,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i,j+p)
 				if f == 1:
 					y[i][j+p] = 1
-					break
+				break
 			if j+p<8 and x[i][j+p]%2 == 0 and x[i][j+p] > 0:
 				break
 		for p in range(1,8):
@@ -1473,7 +1471,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i,j-p)
 				if f == 1:
 					y[i][j-p] = 1
-					break
+				break
 			if j-p>-1 and x[i][j-p]%2 == 0 and x[i][j-p] > 0:
 				break
 		for p in range(1,8):
@@ -1485,7 +1483,8 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i+p,j)
 				if f == 1:
 					y[i+p][j] = 1
-					break
+				break
+				
 			if i+p<8 and x[i+p][j]%2 == 0 and x[i+p][j] > 0:
 				break
 		for p in range(1,8):
@@ -1497,7 +1496,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i-p,j)
 				if f == 1:
 					y[i-p][j] = 1
-					break
+				break
 			if i-p>-1 and x[i-p][j]%2 == 0 and x[i-p][j] > 0:
 				break
 
@@ -1511,7 +1510,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i,j+p)
 				if f == 1:
 					y[i][j+p] = 1
-					break
+				break
 			if j+p<8 and x[i][j+p]%2 == 1:
 				break
 		for p in range(1,8):
@@ -1523,7 +1522,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i,j-p)
 				if f == 1:
 					y[i][j-p] = 1
-					break
+				break
 			if j-p>-1 and x[i][j-p]%2 == 1:
 				break
 		for p in range(1,8):
@@ -1535,7 +1534,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i+p,j)
 				if f == 1:
 					y[i+p][j] = 1
-					break
+				break
 			if i+p<8 and x[i+p][j]%2 == 1:
 				break
 		for p in range(1,8):
@@ -1547,7 +1546,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i-p,j)
 				if f == 1:
 					y[i-p][j] = 1
-					break
+				break
 			if i-p>-1 and x[i-p][j]%2 == 1:
 				break
 
@@ -1561,7 +1560,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i+p,j+p)
 				if f == 1:
 					y[i+p][j+p] = 1
-					break
+				break
 			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 0 and x[i+p][j+p] > 0:
 				break
 		for p in range(1,8):
@@ -1573,7 +1572,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i-p,j-p)
 				if f == 1:
 					y[i-p][j-p] = 1
-					break
+				break
 			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 0 and x[i-p][j-p] > 0:
 				break
 		for p in range(1,8):
@@ -1585,7 +1584,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i+p,j-p)
 				if f == 1:
 					y[i+p][j-p] = 1
-					break
+				break
 			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 0 and x[i+p][j-p] > 0:
 				break
 		for p in range(1,8):
@@ -1597,7 +1596,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i-p,j+p)
 				if f == 1:
 					y[i-p][j+p] = 1
-					break
+				break
 			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 0 and x[i-p][j+p] > 0:
 				break
 
@@ -1611,7 +1610,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i+p,j+p)
 				if f == 1:
 					y[i+p][j+p] = 1
-					break
+				break
 			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 1:
 				break
 		for p in range(1,8):
@@ -1623,7 +1622,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i-p,j-p)
 				if f == 1:
 					y[i-p][j-p] = 1
-					break
+				break
 			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 1:
 				break
 		for p in range(1,8):
@@ -1635,7 +1634,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i+p,j-p)
 				if f == 1:
 					y[i+p][j-p] = 1
-					break
+				break
 			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 1:
 				break
 		for p in range(1,8):
@@ -1647,7 +1646,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i-p,j+p)
 				if f == 1:
 					y[i-p][j+p] = 1
-					break
+				break
 			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 1:
 				break
 
@@ -1661,7 +1660,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i+p,j+p)
 				if f == 1:
 					y[i+p][j+p] = 1
-					break
+				break
 			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 0 and x[i+p][j+p] > 0:
 				break
 		for p in range(1,8):
@@ -1673,7 +1672,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i-p,j-p)
 				if f == 1:
 					y[i-p][j-p] = 1
-					break
+				break
 			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 0 and x[i-p][j-p] > 0:
 				break
 		for p in range(1,8):
@@ -1685,7 +1684,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i+p,j-p)
 				if f == 1:
 					y[i+p][j-p] = 1
-					break
+				break
 			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 0 and x[i+p][j-p] > 0:
 				break
 		for p in range(1,8):
@@ -1697,7 +1696,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i-p,j+p)
 				if f == 1:
 					y[i-p][j+p] = 1
-					break
+				break
 			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 0 and x[i-p][j+p] > 0:
 				break
 		for p in range(1,8):
@@ -1709,7 +1708,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i,j+p)
 				if f == 1:
 					y[i][j+p] = 1
-					break
+				break
 			if j+p<8 and x[i][j+p]%2 == 0 and x[i][j+p] > 0:
 				break
 		for p in range(1,8):
@@ -1721,7 +1720,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i,j-p)
 				if f == 1:
 					y[i][j-p] = 1
-					break
+				break
 			if j-p>-1 and x[i][j-p]%2 == 0 and x[i][j-p] > 0:
 				break
 		for p in range(1,8):
@@ -1733,7 +1732,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i+p,j)
 				if f == 1:
 					y[i+p][j] = 1
-					break
+				break
 			if i+p<8 and x[i+p][j]%2 == 0 and x[i+p][j] > 0:
 				break
 		for p in range(1,8):
@@ -1745,7 +1744,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularB(i-p,j)
 				if f == 1:
 					y[i-p][j] = 1
-					break
+				break
 			if i-p>-1 and x[i-p][j]%2 == 0 and x[i-p][j] > 0:
 				break
 
@@ -1759,7 +1758,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i+p,j+p)
 				if f == 1:
 					y[i+p][j+p] = 1
-					break
+				break
 			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 1:
 				break
 		for p in range(1,8):
@@ -1771,7 +1770,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i-p,j-p)
 				if f == 1:
 					y[i-p][j-p] = 1
-					break
+				break
 			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 1:
 				break
 		for p in range(1,8):
@@ -1783,7 +1782,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i+p,j-p)
 				if f == 1:
 					y[i+p][j-p] = 1
-					break
+				break
 			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 1:
 				break
 		for p in range(1,8):
@@ -1795,7 +1794,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i-p,j+p)
 				if f == 1:
 					y[i-p][j+p] = 1
-					break
+				break
 			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 1:
 				break
 		for p in range(1,8):
@@ -1807,7 +1806,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i,j+p)
 				if f == 1:
 					y[i][j+p] = 1
-					break
+				break
 			if j+p<8 and x[i][j+p]%2 == 1:
 				break
 		for p in range(1,8):
@@ -1819,7 +1818,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i,j-p)
 				if f == 1:
 					y[i][j-p] = 1
-					break
+				break
 			if j-p>-1 and x[i][j-p]%2 == 1:
 				break
 		for p in range(1,8):
@@ -1831,7 +1830,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i+p,j)
 				if f == 1:
 					y[i+p][j] = 1
-					break
+				break
 			if i+p<8 and x[i+p][j]%2 == 1:
 				break
 		for p in range(1,8):
@@ -1843,7 +1842,7 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				f = checkparticularW(i-p,j)
 				if f == 1:
 					y[i-p][j] = 1
-					break
+				break
 			if i-p>-1 and x[i-p][j]%2 == 1:
 				break
 
@@ -2313,8 +2312,13 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 				isValidMove = True
 				break
 
+
 	if not isValidMove:
 		getAvailable(x, i,j,x1,y1,x2,y2)
+	# if z!=v:
+	# 	print(z)
+	# 	print(v)
+
 
 def checkparticularB(i,j):
 	c=0
@@ -3375,7 +3379,7 @@ def getAllAvailableMoves(boardArray, color):
 			if color == 'Black' and boardArrayNp[i][j] in [2,4,6,8,10,12]:
 				getAvailableDerived(boardArrayNp,i, j, 0, 0, 0, 0)
 			elif color == 'White' and boardArrayNp[i][j] in [1,3,5,7,9,11]:
-				getAvailableDerived(boardArrayNp,i, j, 0, 0, 0, 0)
+				getAvailable(boardArrayNp,i, j, 0, 0, 0, 0)
 			piece = boardArrayNp[i][j]
 			for y_i in range(8):
 				for y_j in range(8):
