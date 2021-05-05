@@ -46,9 +46,8 @@ checkmateW = 0
 checkmateB = 0
 isWhiteCheck = False
 isblackCheck = False
-
 fileName = 'BoardMoveWeightDict.npy'
-
+totalNodes = 0
 if os.path.isfile(fileName):
     #print('File exists')
     BoardMoveWeightDict = np.load(fileName, allow_pickle=True).item()
@@ -72,6 +71,7 @@ def main():
 	global endTime
 	global totalMoves
 	global totalTime
+	global totalNodes
 	totalMoves = 0
 	totalTime = 0
 	txt = Text(Point(500,100),"CHESS PYTHON")
@@ -216,7 +216,7 @@ def main():
 				# count = count + 1
 				selected = 1
 		elif key == 'Return':
-			
+			totalNodes = 0
 			if y[i][j] != 0:
 				txt4.undraw()
 				if count%2 == 0:
@@ -263,7 +263,7 @@ def main():
 					isblackCheck = blackCheck()
 					isWhiteCheck = False
 				count = count+1
-
+				print(type(totalNodes), totalNodes, "***main function***")
 				resetMinMax()
 				#print('input given to minimax is')
 				#print(x)
@@ -272,7 +272,7 @@ def main():
 				totalMoves = totalMoves + 1
 				print("now*******")
 				startTime = time.time()
-
+				
 				weight, boardMiniMax = minimax(x, 3, 'Black')
 				np.save(fileName, BoardMoveWeightDict)
 				x = boardMiniMax
@@ -281,6 +281,7 @@ def main():
 				#print(boardMiniMax)
 				endTime = time.time()
 				print(endTime-startTime)
+				print(totalNodes)
 				totalTime = totalTime + (endTime-startTime)
 				print(totalTime/totalMoves)
 				print("then*******")
@@ -3401,6 +3402,8 @@ def resetMinMax():
 def minimax(board, depth, color):
 	global maxWeight
 	global minWeight
+	global totalNodes
+	totalNodes = totalNodes + 1
 	# global checkMateW
 	# global checkMateB
 	# #print('Called for ')

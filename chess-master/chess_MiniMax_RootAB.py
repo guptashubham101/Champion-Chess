@@ -40,7 +40,7 @@ checkmateW = 0
 checkmateB = 0
 isWhiteCheck = False
 isblackCheck = False
-
+totalNodes = 0
 fileName = 'BoardWeightDictAB.npy'
 
 if os.path.isfile(fileName):
@@ -66,6 +66,7 @@ def main():
 	global endTime
 	global totalMoves
 	global totalTime
+	global totalNodes
 	totalMoves = 0
 	totalTime = 0
 	
@@ -170,6 +171,7 @@ def main():
 			y2=y2+80
 			j=j+1
 		elif key == 'Escape' and esc == 0:
+			totalNodes = 0
 			if count%2 == 1 and x[i][j]%2 == 1:
 				if selected == 1:
 					x[l][m] = piece
@@ -255,7 +257,7 @@ def main():
 					isblackCheck = blackCheck()
 					isWhiteCheck = False
 				count = count+1
-
+				print(type(totalNodes), totalNodes, "***main function***")
 				resetMinMax()
 				#print('input given to minimax is')
 				#print(x)
@@ -263,7 +265,7 @@ def main():
 				totalMoves = totalMoves + 1
 				print("now*******")
 				startTime = time.time()
-				boardMiniMax = minimaxRootAB(4, x, False)
+				boardMiniMax = minimaxRootAB(3, x, False)
 				np.save(fileName, BoardWeightDictAB)
 				#weight, boardMiniMax = minimax(x, 4, 'Black')
 				x = boardMiniMax
@@ -273,6 +275,7 @@ def main():
 
 				endTime = time.time()
 				print(endTime-startTime)
+				print(totalNodes)
 				totalTime = totalTime + (endTime-startTime)
 				print(totalTime/totalMoves)
 				print("then*******")
@@ -3530,6 +3533,8 @@ def minimaxRootAB(depth, board, isMaximizing):
 
 def minimaxFromRootAB(depth, board, alpha, beta, is_maximizing):
 	color = "White" if is_maximizing else "Black"
+	global totalNodes
+	totalNodes = totalNodes + 1
 	if (tuple(map(tuple, board)), depth, alpha, beta, color) in BoardWeightDictAB:
 		weight = BoardWeightDictAB[(tuple(map(tuple, board)), depth, alpha, beta, color)]
 		return  weight
