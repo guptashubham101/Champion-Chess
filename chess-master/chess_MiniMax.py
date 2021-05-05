@@ -3,14 +3,6 @@ import numpy as np
 import os
 import time
 
-# x0 = [4,2,0,0,0,0,1,3]
-# x1 = [6,2,0,0,0,0,1,5]
-# x2 = [8,2,0,0,0,0,1,7]
-# x3 = [10,2,0,0,0,0,1,9]
-# x4 = [12,2,0,0,0,0,1,11]
-# x5 = [8,2,0,0,0,0,1,7]
-# x6 = [6,2,0,0,0,0,1,5]
-# x7 = [4,2,0,0,0,0,1,3]
 # 2 and 1 -> Pawn
 # 3 and 4 -> Rook
 # 5 and 6 -> Knight
@@ -148,11 +140,6 @@ def main():
 	txt4.setSize(20)
 	txt4.draw(win)
 
-	#print('before while checkmateW = ')
-	#print(checkmateW is None)
-	#print('before while checkmateB = ')
-	#print(checkmateB is None)
-
 	while checkmateW == 0 and checkmateB == 0:
 		
 		key = win.getKey()
@@ -193,27 +180,7 @@ def main():
 				showAvailable()
 				x[i][j]=0
 				selected = 1
-			elif count%2 == 0:  #and x[i][j]%2 == 0 and x[i][j] > 0:
-				# if selected == 1:
-				# 	x[l][m] = piece
-				# 	hideAvailable()
-				# 	set()
-				# sq1 = Rectangle(Point(x1,y1),Point(x2,y2))
-				# sq1.setWidth(10)
-				# sq1.setOutline(color_rgb(70,173,212))
-				# sq1.draw(win)
-				# l = i
-				# m = j
-				# piece = x[i][j]
-				# getAvailable(x, i,j,x1,y1,x2,y2)
-				# showAvailable()
-				# x[i][j]=0
-				# selected = 1
-
-				# weight, boardMiniMax = minimax(x, 4, 'Black')
-				# x = boardMiniMax
-				# board()
-				# count = count + 1
+			elif count%2 == 0: 
 				selected = 1
 		elif key == 'Return':
 			totalNodes = 0
@@ -851,23 +818,11 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 	safeToMove = True
 
 	if relativePosOfKing != "NotRelated":
-		#print("relation with respect to board")
-		#print(x)
-		#print("for piece")
-		#print(x[i][j])
-		#print("and position")
-		#print(str(i) + " , " + str(j))
 		pass
 
 	if relativePosOfKing == "RelatedFromDown":
 		for rowIter in range(i-1, -1, -1):
 			if x[rowIter][j] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
-				#print("piece creating danger")
-				#print(x[rowIter][j])
-				#print("at position")
-				#print(str(rowIter) + " , " + str(j))
-				#print("y before modification is")
-				#print(y)
 				safeToMove = False
 				break
 			elif x[rowIter][j] != 0:
@@ -880,12 +835,6 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 	if relativePosOfKing == "RelatedFromUp":
 		for rowIter in range(i, 7):
 			if x[rowIter][j] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
-				#print("piece creating danger")
-				#print(x[rowIter][j])
-				#print("at position")
-				#print(str(rowIter) + " , " + str(j))
-				#print("y before modification is")
-				#print(y)
 				safeToMove = False
 				break
 			elif x[rowIter][j] != 0:
@@ -898,12 +847,6 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 	if relativePosOfKing == "RelatedFromRight":
 		for colIter in range(j-1, -1, -1):
 			if x[i][colIter] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
-				#print("piece creating danger")
-				#print(x[i][colIter])
-				#print("at position")
-				#print(str(i) + " , " + str(colIter))
-				#print("y before modification is")
-				#print(y)
 				safeToMove = False
 				break
 			elif x[i][colIter] != 0:
@@ -916,12 +859,6 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 	if relativePosOfKing == "RelatedFromLeft":
 		for colIter in range(j+1, 8):
 			if x[i][colIter] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
-				#print("piece creating danger")
-				#print(x[i][colIter])
-				#print("at position")
-				#print(str(i) + " , " + str(colIter))
-				#print("y before modification is")
-				#print(y)
 				safeToMove = False
 				break
 			elif x[i][colIter] != 0:
@@ -935,19 +872,10 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 		for rowIter in range(i-1, -1, -1):
 			for colIter in range(j-1, -1, -1):
 				if rowIter - colIter == i - j and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
-					#print("piece creating danger")
-					#print(x[rowIter][colIter])
-					#print("at position")
-					#print(str(rowIter) + " , " + str(colIter))
-					#print("y before modification is")
-					#print(y)
 					safeToMove = False
 					break
 				elif rowIter - colIter == i - j and x[rowIter][colIter] != 0:
 					break
-			# else:
-			# 	continue
-			# break
 		if not safeToMove:
 			for rowIter in range(0, 8):
 				for colIter in range(0, 8):
@@ -957,19 +885,10 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 		for rowIter in range(i+1, 8):
 			for colIter in range(j+1, 8):
 				if rowIter - colIter == i - j and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
-					#print("piece creating danger")
-					#print(x[rowIter][colIter])
-					#print("at position")
-					#print(str(rowIter) + " , " + str(colIter))
-					#print("y before modification is")
-					#print(y)
 					safeToMove = False
 					break
 				elif rowIter - colIter == i - j and x[rowIter][colIter] != 0:
 					break
-			# else:
-			# 	continue
-			# break
 		if not safeToMove:
 			for rowIter in range(0, 8):
 				for colIter in range(0, 8):
@@ -979,19 +898,10 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 		for rowIter in range(i, 8):
 			for colIter in range(j-1, -1, -1):
 				if rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
-					#print("piece creating danger")
-					#print(x[rowIter][colIter])
-					#print("at position")
-					#print(str(rowIter) + " , " + str(colIter))
-					#print("y before modification is")
-					#print(y)
 					safeToMove = False
 					break
 				elif rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] != 0:
 					break
-			# else:
-			# 	continue
-			# break
 		if not safeToMove:
 			for rowIter in range(0, 8):
 				for colIter in range(0, 8):
@@ -1001,12 +911,6 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 		for rowIter in range(i-1, -1, -1):
 			for colIter in range(j, 8):
 				if rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
-					#print("piece creating danger")
-					#print(x[rowIter][colIter])
-					#print("at position")
-					#print(str(rowIter) + " , " + str(colIter))
-					#print("y before modification is")
-					#print(y)
 					safeToMove = False
 					break
 				elif rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] != 0:
@@ -1942,23 +1846,11 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 	safeToMove = True
 
 	if relativePosOfKing != "NotRelated":
-		#print("relation with respect to board")
-		#print(x)
-		#print("for piece")
-		#print(x[i][j])
-		#print("and position")
-		#print(str(i) + " , " + str(j))
 		pass
 
 	if relativePosOfKing == "RelatedFromDown":
 		for rowIter in range(i-1, -1, -1):
 			if x[rowIter][j] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
-				#print("piece creating danger")
-				#print(x[rowIter][j])
-				#print("at position")
-				#print(str(rowIter) + " , " + str(j))
-				#print("y before modification is")
-				#print(y)
 				safeToMove = False
 				break
 			elif x[rowIter][j] != 0:
@@ -1971,12 +1863,6 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 	if relativePosOfKing == "RelatedFromUp":
 		for rowIter in range(i, 7):
 			if x[rowIter][j] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
-				#print("piece creating danger")
-				#print(x[rowIter][j])
-				#print("at position")
-				#print(str(rowIter) + " , " + str(j))
-				#print("y before modification is")
-				#print(y)
 				safeToMove = False
 				break
 			elif x[rowIter][j] != 0:
@@ -1989,12 +1875,6 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 	if relativePosOfKing == "RelatedFromRight":
 		for colIter in range(j-1, -1, -1):
 			if x[i][colIter] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
-				#print("piece creating danger")
-				#print(x[i][colIter])
-				#print("at position")
-				#print(str(i) + " , " + str(colIter))
-				#print("y before modification is")
-				#print(y)
 				safeToMove = False
 				break
 			elif x[i][colIter] != 0:
@@ -2007,12 +1887,6 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 	if relativePosOfKing == "RelatedFromLeft":
 		for colIter in range(j+1, 8):
 			if x[i][colIter] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
-				#print("piece creating danger")
-				#print(x[i][colIter])
-				#print("at position")
-				#print(str(i) + " , " + str(colIter))
-				#print("y before modification is")
-				#print(y)
 				safeToMove = False
 				break
 			elif x[i][colIter] != 0:
@@ -2026,19 +1900,10 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 		for rowIter in range(i-1, -1, -1):
 			for colIter in range(j-1, -1, -1):
 				if rowIter - colIter == i - j and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
-					#print("piece creating danger")
-					#print(x[rowIter][colIter])
-					#print("at position")
-					#print(str(rowIter) + " , " + str(colIter))
-					#print("y before modification is")
-					#print(y)
 					safeToMove = False
 					break
 				elif rowIter - colIter == i - j and x[rowIter][colIter] != 0:
 					break
-			# else:
-			# 	continue
-			# break
 		if not safeToMove:
 			for rowIter in range(0, 8):
 				for colIter in range(0, 8):
@@ -2048,12 +1913,6 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 		for rowIter in range(i+1, 8):
 			for colIter in range(j+1, 8):
 				if rowIter - colIter == i - j and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
-					#print("piece creating danger")
-					#print(x[rowIter][colIter])
-					#print("at position")
-					#print(str(rowIter) + " , " + str(colIter))
-					#print("y before modification is")
-					#print(y)
 					safeToMove = False
 					break
 				elif rowIter - colIter == i - j and x[rowIter][colIter] != 0:
@@ -2070,19 +1929,10 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 		for rowIter in range(i, 8):
 			for colIter in range(j-1, -1, -1):
 				if rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
-					#print("piece creating danger")
-					#print(x[rowIter][colIter])
-					#print("at position")
-					#print(str(rowIter) + " , " + str(colIter))
-					#print("y before modification is")
-					#print(y)
 					safeToMove = False
 					break
 				elif rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] != 0:
 					break
-			# else:
-			# 	continue
-			# break
 		if not safeToMove:
 			for rowIter in range(0, 8):
 				for colIter in range(0, 8):
@@ -2092,19 +1942,10 @@ def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 		for rowIter in range(i-1, -1, -1):
 			for colIter in range(j, 8):
 				if rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
-					#print("piece creating danger")
-					#print(x[rowIter][colIter])
-					#print("at position")
-					#print(str(rowIter) + " , " + str(colIter))
-					#print("y before modification is")
-					#print(y)
 					safeToMove = False
 					break
 				elif rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] != 0:
 					break
-			# else:
-			# 	continue
-			# break
 		if not safeToMove:
 			for rowIter in range(0, 8):
 				for colIter in range(0, 8):
@@ -3380,7 +3221,7 @@ def getAllAvailableMoves(boardArray, color):
 			if color == 'Black' and boardArrayNp[i][j] in [2,4,6,8,10,12]:
 				getAvailableDerived(boardArrayNp,i, j, 0, 0, 0, 0)
 			elif color == 'White' and boardArrayNp[i][j] in [1,3,5,7,9,11]:
-				getAvailable(boardArrayNp,i, j, 0, 0, 0, 0)
+				getAvailableDerived(boardArrayNp,i, j, 0, 0, 0, 0)
 			piece = boardArrayNp[i][j]
 			for y_i in range(8):
 				for y_j in range(8):
@@ -3404,16 +3245,6 @@ def minimax(board, depth, color):
 	global minWeight
 	global totalNodes
 	totalNodes = totalNodes + 1
-	# global checkMateW
-	# global checkMateB
-	# #print('Called for ')
-	# #print(board)
-	# #print('with depth ')
-	# #print(depth)
-	# #print('and color')
-	# #print(color)
-	# #print(maxWeight)
-	# #print(minWeight)
 	tempboard = np.copy(board)
 
 	if (tuple(map(tuple, board)), depth, color) in BoardMoveWeightDict:
@@ -3430,11 +3261,6 @@ def minimax(board, depth, color):
 			return weight, tempboard
 
 		listOfMoves = getAllAvailableMoves(tempboard, color)
-		# #print('for position ')
-		# #print(tempboard)
-		# #print('available moves are')
-		# #print(listOfMoves)
-		
 		if color == "White":
 			for move in listOfMoves:
 				weight, tboard = minimax(move, depth - 1, "Black")
@@ -3456,69 +3282,15 @@ def minimax(board, depth, color):
 		elif color == "Black":
 			for move in listOfMoves:
 				weight, tboard = minimax(move, depth - 1, "White")
-				##print(weight)
-				#minWeight = min(minWeight, weight)
 				if weight < minWeight:
 					##print('inside black if')
 					minWeight = weight
 					tempboard = move
-			# 		#print('changed tempboard to ')
-			# 		#print(tempboard)
-			# #print('returning from black ')
-			# #print(tempboard)
 			weightToReturn = minWeight
 			minWeight = 99999
 			BoardMoveWeightDict[(tuple(map(tuple, board)), depth, color)] = [weightToReturn, tempboard]
 			#np.save(fileName, BoardMoveWeightDict)
 			return weightToReturn, tempboard
-
-### Trial section for minimax #########################################################################
-
-#board = []
-
-# def minimaxRoot(depth, board, isMaximizing):
-#     #possibleMoves = getAllAvailableMoves(tempboard, color)
-#     color = "White" if isMaximizing else "Black"
-#     possibleMoves = getAllAvailableMoves(board, color)
-#     bestMove = -9999
-#     secondBest = -9999
-#     thirdBest = -9999
-#     bestMoveFinal = None
-#     for move in possibleMoves:
-#         #board.append(move)
-#         value = max(bestMove, minimax(depth - 1, move, not isMaximizing))
-#         #board.pop()
-#         if( value > bestMove):
-#             #print("Best score: " ,str(bestMove))
-#             #print("Best move: ",str(bestMoveFinal))
-#             #print("Second best: ", str(secondBest))
-#             thirdBest = secondBest
-#             secondBest = bestMove
-#             bestMove = value
-#             bestMoveFinal = move
-#     return bestMoveFinal
-
-# def minimax(depth, board, is_maximizing):
-#     if(depth == 0):
-#         return -1 * calculateTotalWeight(board)
-#     color = "White" if is_maximizing else "Black"
-#     possibleMoves = getAllAvailableMoves(board, color)
-#     if(is_maximizing):
-#         bestMove = -9999
-#         for move in possibleMoves:
-#             #board.append(move)
-#             bestMove = max(bestMove,minimax(depth - 1, move, not is_maximizing))
-#             #board.pop()
-#         return bestMove
-#     else:
-#         bestMove = 9999
-#         for move in possibleMoves:
-#             #board.append(move)
-#             bestMove = min(bestMove, minimax(depth - 1, move, not is_maximizing))
-#             #board.pop()
-#         return bestMove
-
-### Trial section for minimax #########################################################################
 
 def convertToWeights(boardArray):
 	boardArrayNp = np.array(boardArray)

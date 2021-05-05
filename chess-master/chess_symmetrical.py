@@ -1,6 +1,7 @@
 from graphics import *
 import numpy as np
 import os
+import time
 
 # x0 = [4,2,0,0,0,0,1,3]
 # x1 = [6,2,0,0,0,0,1,5]
@@ -11,14 +12,14 @@ import os
 # x6 = [6,2,0,0,0,0,1,5]
 # x7 = [4,2,0,0,0,0,1,3]
 
-x0 = [4,2,0,0,0,0,1,3]
-x1 = [6,2,0,0,0,0,1,5]
-x2 = [8,2,0,0,0,0,1,7]
-x3 = [10,2,0,0,0,0,1,9]
-x4 = [12,2,0,0,0,0,1,11]
-x5 = [8,2,0,0,0,0,1,7]
-x6 = [6,2,0,0,0,0,1,5]
-x7 = [4,2,0,0,0,0,1,3]
+x0 = [0,0,0,0,0,0,0,0]
+x1 = [0,0,0,0,0,0,0,0]
+x2 = [0,0,0,0,0,0,0,0]
+x3 = [0,0,0,0,0,0,0,0]
+x4 = [0,2,0,11,0,0,8,0]
+x5 = [0,9,0,0,0,0,0,0]
+x6 = [0,0,0,0,0,0,0,0]
+x7 = [12,0,0,0,6,0,0,0]
 
 x = [x0,x1,x2,x3,x4,x5,x6,x7]
 
@@ -39,15 +40,14 @@ checkmateW = 0
 checkmateB = 0
 isWhiteCheck = False
 isblackCheck = False
-
-fileName = 'BoardMoveWeightDictAB.npy'
+totalNodes = 0
+fileName = 'BoardWeightDictAB.npy'
+boardsVisited = []
 
 if os.path.isfile(fileName):
-    #print('File exists')
-    BoardMoveWeightDictAB = np.load(fileName, allow_pickle=True).item()
+    BoardWeightDictAB = np.load(fileName, allow_pickle=True).item()
 else:
-    #print('File does not exist')
-    BoardMoveWeightDictAB = {}
+    BoardWeightDictAB = {}
 
 def set():
 	for i in range(8):
@@ -61,20 +61,26 @@ def main():
 	global x
 	global isWhiteCheck
 	global isblackCheck
+	global startTime
+	global endTime
+	global totalMoves
+	global totalTime
+	global totalNodes
+	global boardsVisited
 
+	totalMoves = 0
+	totalTime = 0
+	
 	txt = Text(Point(500,100),"CHESS PYTHON")
 	txt.setSize(50)
 	txt.draw(win)
-	#img = Image(Point(500,300), "start.gif")
-	#img.draw(win)
 	txt2 = Text(Point(500,600), "click to start game")
 	txt2.setSize(30)
 	txt2.draw(win)
 	win.getMouse()
 	txt.undraw()
-	#img.undraw()
 	txt2.undraw()
-
+	
 	board()
 	count = 1
 	piece = 0
@@ -109,6 +115,14 @@ def main():
 	txt8.setSize(15)
 	txt8.draw(win)
 
+	txt9 = Text(Point(820,500),"Time taken by computer(sec)")
+	txt9.setSize(15)
+	txt9.draw(win)
+
+	txt10 = Text(Point(820,520),0)
+	txt10.setSize(15)
+	txt10.draw(win)
+
 	esc = 0
 	x1=0
 	y1=0
@@ -126,11 +140,6 @@ def main():
 	txt4 = Text(Point(825,600), "White's move")
 	txt4.setSize(20)
 	txt4.draw(win)
-
-	#print('before while checkmateW = ')
-	#print(checkmateW is None)
-	#print('before while checkmateB = ')
-	#print(checkmateB is None)
 
 	while checkmateW == 0 and checkmateB == 0:
 		key = win.getKey()
@@ -155,6 +164,7 @@ def main():
 			y2=y2+80
 			j=j+1
 		elif key == 'Escape' and esc == 0:
+			totalNodes = 0
 			if count%2 == 1 and x[i][j]%2 == 1:
 				if selected == 1:
 					x[l][m] = piece
@@ -171,27 +181,7 @@ def main():
 				showAvailable()
 				x[i][j]=0
 				selected = 1
-			elif count%2 == 0:  #and x[i][j]%2 == 0 and x[i][j] > 0:
-				# if selected == 1:
-				# 	x[l][m] = piece
-				# 	hideAvailable()
-				# 	set()
-				# sq1 = Rectangle(Point(x1,y1),Point(x2,y2))
-				# sq1.setWidth(10)
-				# sq1.setOutline(color_rgb(70,173,212))
-				# sq1.draw(win)
-				# l = i
-				# m = j
-				# piece = x[i][j]
-				# getAvailable(x, i,j,x1,y1,x2,y2)
-				# showAvailable()
-				# x[i][j]=0
-				# selected = 1
-
-				# weight, boardMiniMax = minimax(x, 4, 'Black')
-				# x = boardMiniMax
-				# board()
-				# count = count + 1
+			elif count%2 == 0: 
 				selected = 1
 		elif key == 'Return':
 			if y[i][j] != 0:
@@ -240,18 +230,33 @@ def main():
 					isblackCheck = blackCheck()
 					isWhiteCheck = False
 				count = count+1
-
+				print(type(totalNodes), totalNodes, "***main function***")
 				resetMinMax()
-				#print('input given to minimax is')
-				#print(x)
 				set()
-				#boardMiniMax = minimaxRoot(2, x, False)
-				weight, boardMiniMax = minimaxAB(x, 4, -10000, 10000, 'Black')
-				np.save(fileName, BoardMoveWeightDictAB)
+				boardsVisited = []
+				totalMoves = totalMoves + 1
+				print("now*******")
+				startTime = time.time()
+				boardMiniMax = minimaxRootAB(3, x, False)
+				np.save(fileName, BoardWeightDictAB)
 				x = boardMiniMax
+				
 
-				#print('output from minimax is ')
-				#print(boardMiniMax)
+				endTime = time.time()
+				print(endTime-startTime)
+				print(totalNodes)
+				totalTime = totalTime + (endTime-startTime)
+				print(totalTime/totalMoves)
+				print("then*******")
+				txt9 = Text(Point(820,500),"Time taken by computer(sec)")
+				txt9.setSize(15)
+				txt9.draw(win)
+
+				txt10.undraw()
+
+				txt10 = Text(Point(820,520),round(totalTime/totalMoves,1))
+				txt10.setSize(15)
+				txt10.draw(win)
 
 				board()
 				isWhiteCheck = whiteCheck()
@@ -270,7 +275,7 @@ def main():
 	win.close()
 
 
-def getAvailable(x, i,j,x1,y1,x2,y2):
+def getAvailableDerived(x, i,j,x1,y1,x2,y2):
 	global isWhiteCheck
 	global isblackCheck
 
@@ -279,31 +284,27 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 		kingValue = 12
 	else:
 		kingValue = 11
-
+		
 	for rowIter in range(i + 1, 8):
 		if x[rowIter][j] == kingValue:
-			#print("inside relatedFromDown")
 			relativePosOfKing = "RelatedFromDown"
 			break
 		elif x[rowIter][j] != 0:
 			break
 	for rowIter in range(i-1, -1, -1):
 		if x[rowIter][j] == kingValue:
-			#print("inside relatedFromUp")
 			relativePosOfKing = "RelatedFromUp"
 			break
 		elif x[rowIter][j] != 0:
 			break
 	for colIter in range(j + 1, 8):
 		if x[i][colIter] == kingValue:
-			#print("inside relatedFromRight")
 			relativePosOfKing = "RelatedFromRight"
 			break
 		elif x[i][colIter] != 0:
 			break
 	for colIter in range(j-1, -1, -1):
 		if x[i][colIter] == kingValue:
-			#print("inside relatedFromLeft")
 			relativePosOfKing = "RelatedFromLeft"
 			break
 		elif x[i][colIter] != 0:
@@ -311,7 +312,6 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 	for rowIter in range(i + 1, 8):
 		for colIter in range(j + 1, 8):
 			if rowIter - colIter == i - j and x[rowIter][colIter] == kingValue:
-				#print("inside relatedFromDownRight")
 				relativePosOfKing = "RelatedFromDownRight"
 				break
 			elif rowIter - colIter == i - j and x[rowIter][colIter] != 0:
@@ -322,7 +322,6 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 	for rowIter in range(i-1, -1, -1):
 		for colIter in range(j-1, -1, -1):
 			if rowIter - colIter == i - j and x[rowIter][colIter] == kingValue:
-				#print("inside relatedFromUpLeft")
 				relativePosOfKing = "RelatedFromUpLeft"
 				break
 			elif rowIter - colIter == i - j and x[rowIter][colIter] != 0:
@@ -333,7 +332,6 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 	for rowIter in range(i-1, -1, -1):
 		for colIter in range(j + 1, 8):
 			if rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] == kingValue:
-				#print("inside relatedFromUpRight")
 				relativePosOfKing = "RelatedFromUpRight"
 				break
 			elif rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] != 0:
@@ -344,7 +342,1034 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 	for rowIter in range(i + 1, 8):
 		for colIter in range(j-1, -1, -1):
 			if rowIter - i == -1 * (colIter - j) and  x[rowIter][colIter] == kingValue:
-				#print("inside relatedFromDownLeft")
+				relativePosOfKing = "RelatedFromDownLeft"
+				break
+			elif rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] != 0:
+				break
+		else:
+			continue
+		break
+
+	if x[i][j] == 2:
+		if y[i][j+1] == 0 and x[i][j+1] == 0:
+			f = checkparticularB(i,j+1)
+			if f == 1:
+				y[i][j+1]=1
+		if j == 1 and y[i][j+2] == 0 and x[i][j+2] == 0:
+			f = checkparticularB(i,j+2)
+			if f == 1:
+				y[i][j+2]=1
+		if i < 7:
+			if x[i+1][j+1]%2 == 1:
+				f = checkparticularB(i+1,j+1)
+				if f == 1:
+					y[i][j+1]=1
+		if i-1>-1:
+			if x[i-1][j+1]%2 == 1:
+				f = checkparticularB(i-1,j+1)
+				if f == 1:
+					y[i-1][j+1]=1
+		if j == 6 and x[i][j+1] == 0:
+			f = checkparticularB(i,j+1)
+			if f == 1:
+				y[i][j+1]=6
+		if j == 6 and i+1<8:
+			if x[i+1][j+1]%2 == 1:
+				f = checkparticularB(i+1,j+1)
+				if f == 1:
+					y[i+1][j+1]=6
+		if j == 6 and i-1>-1:
+			if x[i-1][j+1]%2 == 1:
+				f = checkparticularB(i-1,j+1)
+				if f == 1:
+					y[i][j+1]=6
+
+	if x[i][j] == 1:
+		if y[i][j-1] == 0 and x[i][j-1] == 0:
+			f = checkparticularW(i,j-1)
+			if f == 1:
+				y[i][j-1]=1
+		if j == 6 and y[i][j-2] == 0 and x[i][j-2] == 0:
+			f = checkparticularW(i,j-2)
+			if f == 1:
+				y[i][j-2]=1
+		if i-1>-1:
+			if x[i-1][j-1]%2 == 0 and x[i-1][j-1] > 0:
+				f = checkparticularW(i-1,j-1)
+				if f == 1:
+					y[i-1][j-1]=1
+		if i < 7:
+			if x[i+1][j-1]%2 == 0 and x[i+1][j-1] > 0:
+				f = checkparticularW(i+1,j-1)
+				if f == 1:
+					y[i+1][j-1]=1
+		if j == 1 and x[i][j-1] == 0:
+			f = checkparticularW(i,j-1)
+			if f == 1:
+				y[i][j-1]=7
+		if j == 1 and i+1<8:
+			if x[i+1][j-1]%2 == 0 and x[i+1][j-1] > 0:
+				f = checkparticularW(i+1,j-1)
+				if f == 1:
+					y[i+1][j-1]=7
+		if j == 1 and i-1>-1:
+			if x[i-1][j-1]%2 == 0 and x[i-1][j-1] > 0:
+				f = checkparticularW(i-1,j-1)
+				if f == 1:
+					y[i-1][j-1]=7
+
+	if x[i][j] == 6:
+		if i-1>=0 and j+2<=7:
+			if (y[i-1][j+2] == 0 or x[i-1][j+2]%2 == 1) and (x[i-1][j+2]%2 != 0 or x[i-1][j+2] == 0):
+				f = checkparticularB(i-1,j+2)
+				if f == 1:
+					y[i-1][j+2]=1
+		if i+1<=7 and j+2<=7:
+			if (y[i+1][j+2] == 0 or x[i+1][j+2]%2 == 1) and (x[i+1][j+2]%2 != 0 or x[i+1][j+2] == 0):
+				f = checkparticularB(i+1,j+2)
+				if f == 1:
+					y[i+1][j+2]=1
+		if i-2>=0 and j+1<=7:
+			if (y[i-2][j+1] == 0 or x[i-2][j+1]%2 == 1) and (x[i-2][j+1]%2 != 0 or x[i-2][j+1] == 0):
+				f = checkparticularB(i-2,j+1)
+				if f == 1:
+					y[i-2][j+1]=1
+		if i+2<=7 and j+1<=7:
+			if (y[i+2][j+1] == 0 or x[i+2][j+1]%2 == 1) and (x[i+2][j+1]%2 != 0 or x[i+2][j+1] == 0):
+				f = checkparticularB(i+2,j+1)
+				if f == 1:
+					y[i+2][j+1]=1
+		if i-1>=0 and j-2>=0:
+			if (y[i-1][j-2] == 0 or x[i-1][j-2]%2 == 1) and (x[i-1][j-2]%2 != 0 or x[i-1][j-2] == 0):
+				f = checkparticularB(i-1,j-2)
+				if f == 1:
+					y[i-1][j-2]=1
+		if i+1<=7 and j-2>=0:
+			if (y[i+1][j-2] == 0 or x[i+1][j-2]%2 == 1) and (x[i+1][j-2]%2 != 0 or x[i+1][j-2] == 0):
+				f = checkparticularB(i+1,j-2)
+				if f == 1:
+					y[i+1][j-2]=1
+		if i-2>=0 and j-1>=0:
+			if (y[i-2][j-1] == 0 or x[i-2][j-1]%2 == 1) and (x[i-2][j-1]%2 != 0 or x[i-2][j-1] == 0):
+				f = checkparticularB(i-2,j-1)
+				if f == 1:
+					y[i-2][j-1]=1
+		if i+2<=7 and j-1>=0:
+			if (y[i+2][j-1] == 0 or x[i+2][j-1]%2 == 1) and (x[i+2][j-1]%2 != 0 or x[i+2][j-1] == 0):
+				f = checkparticularB(i+2,j-1)
+				if f == 1:
+					y[i+2][j-1]=1
+
+	if x[i][j] == 5:
+		if i-1>=0 and j+2<=7:
+			if (y[i-1][j+2] == 0 or x[i-1][j+2]%2 == 0) and (x[i-1][j+2]%2 != 1 or x[i-1][j+2] == 0):
+				f = checkparticularW(i-1,j+2)
+				if f == 1:
+					y[i-1][j+2]=1
+		if i+1<=7 and j+2<=7:
+			if (y[i+1][j+2] == 0 or x[i+1][j+2]%2 == 0) and (x[i+1][j+2]%2 != 1 or x[i+1][j+2] == 0):
+				f = checkparticularW(i+1,j+2)
+				if f == 1:
+					y[i+1][j+2]=1
+		if i-2>=0 and j+1<=7:
+			if (y[i-2][j+1] == 0 or x[i-2][j+1]%2 == 0) and (x[i-2][j+1]%2 != 1 or x[i-2][j+1] == 0):
+				f = checkparticularW(i-2,j+1)
+				if f == 1:
+					y[i-2][j+1]=1
+		if i+2<=7 and j+1<=7:
+			if (y[i+2][j+1] == 0 or x[i+2][j+1]%2 == 0) and (x[i+2][j+1]%2 != 1 or x[i+2][j+1] == 0):
+				f = checkparticularW(i+2,j+1)
+				if f == 1:
+					y[i+2][j+1]=1
+		if i-1>=0 and j-2>=0:
+			if (y[i-1][j-2] == 0 or x[i-1][j-2]%2 == 0) and (x[i-1][j-2]%2 != 1 or x[i-1][j-2] == 0):
+				f = checkparticularW(i-1,j-2)
+				if f == 1:
+					y[i-1][j-2]=1
+		if i+1<=7 and j-2>=0:
+			if (y[i+1][j-2] == 0 or x[i+1][j-2]%2 == 0) and (x[i+1][j-2]%2 != 1 or x[i+1][j-2] == 0):
+				f = checkparticularW(i+1,j-2)
+				if f == 1:
+					y[i+1][j-2]=1
+		if i-2>=0 and j-1>=0:
+			if (y[i-2][j-1] == 0 or x[i-2][j-1]%2 == 0) and (x[i-2][j-1]%2 != 1 or x[i-2][j-1] == 0):
+				f = checkparticularW(i-2,j-1)
+				if f == 1:
+					y[i-2][j-1]=1
+		if i+2<=7 and j-1>=0:
+			if (y[i+2][j-1] == 0 or x[i+2][j-1]%2 == 0) and (x[i+2][j-1]%2 != 1 or x[i+2][j-1] == 0):
+				f = checkparticularW(i+2,j-1)
+				if f == 1:
+					y[i+2][j-1]=1
+
+	if x[i][j] == 4:
+		for p in range(1,8):
+			if 	j+p<8 and x[i][j+p] == 0:
+				f = checkparticularB(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
+			if j+p<8 and x[i][j+p]%2 == 1:
+				f = checkparticularB(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
+				break
+			if j+p<8 and x[i][j+p]%2 == 0 and x[i][j+p] > 0:
+				break
+		for p in range(1,8):
+			if 	j-p>-1 and x[i][j-p] == 0:
+				f = checkparticularB(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
+			if j-p>-1 and x[i][j-p]%2 == 1:
+				f = checkparticularB(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
+				break
+			if j-p>-1 and x[i][j-p]%2 == 0 and x[i][j-p] > 0:
+				break
+		for p in range(1,8):
+			if 	i+p<8 and x[i+p][j] == 0:
+				f = checkparticularB(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
+			if i+p<8 and x[i+p][j]%2 == 1:
+				f = checkparticularB(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
+				break
+				
+			if i+p<8 and x[i+p][j]%2 == 0 and x[i+p][j] > 0:
+				break
+		for p in range(1,8):
+			if 	i-p>-1 and x[i-p][j] == 0:
+				f = checkparticularB(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
+			if i-p>-1 and x[i-p][j]%2 == 1:
+				f = checkparticularB(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
+				break
+			if i-p>-1 and x[i-p][j]%2 == 0 and x[i-p][j] > 0:
+				break
+
+	if x[i][j] == 3:
+		for p in range(1,8):
+			if 	j+p<8 and x[i][j+p] == 0:
+				f = checkparticularW(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
+			if j+p<8 and x[i][j+p]%2 == 0 and x[i][j+p] > 0:
+				f = checkparticularW(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
+				break
+			if j+p<8 and x[i][j+p]%2 == 1:
+				break
+		for p in range(1,8):
+			if 	j-p>-1 and x[i][j-p] == 0:
+				f = checkparticularW(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
+			if j-p>-1 and x[i][j-p]%2 == 0 and x[i][j-p] > 0:
+				f = checkparticularW(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
+				break
+			if j-p>-1 and x[i][j-p]%2 == 1:
+				break
+		for p in range(1,8):
+			if 	i+p<8 and x[i+p][j] == 0:
+				f = checkparticularW(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
+			if i+p<8 and x[i+p][j]%2 == 0 and x[i+p][j] > 0:
+				f = checkparticularW(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
+				break
+			if i+p<8 and x[i+p][j]%2 == 1:
+				break
+		for p in range(1,8):
+			if 	i-p>-1 and x[i-p][j] == 0:
+				f = checkparticularW(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
+			if i-p>-1 and x[i-p][j]%2 == 0 and x[i-p][j] > 0:
+				f = checkparticularW(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
+				break
+			if i-p>-1 and x[i-p][j]%2 == 1:
+				break
+
+	if x[i][j] == 8:
+		for p in range(1,8):
+			if 	j+p<8 and i+p<8 and x[i+p][j+p] == 0:
+				f = checkparticularB(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
+			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 1:
+				f = checkparticularB(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
+				break
+			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 0 and x[i+p][j+p] > 0:
+				break
+		for p in range(1,8):
+			if 	i-p>-1 and j-p>-1 and x[i-p][j-p] == 0:
+				f = checkparticularB(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
+			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 1:
+				f = checkparticularB(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
+				break
+			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 0 and x[i-p][j-p] > 0:
+				break
+		for p in range(1,8):
+			if 	i+p<8 and j-p>-1 and x[i+p][j-p] == 0:
+				f = checkparticularB(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
+			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 1:
+				f = checkparticularB(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
+				break
+			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 0 and x[i+p][j-p] > 0:
+				break
+		for p in range(1,8):
+			if 	i-p>-1 and j+p<8 and x[i-p][j+p] == 0:
+				f = checkparticularB(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
+			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 1:
+				f = checkparticularB(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
+				break
+			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 0 and x[i-p][j+p] > 0:
+				break
+
+	if x[i][j] == 7:
+		for p in range(1,8):
+			if 	j+p<8 and i+p<8 and x[i+p][j+p] == 0:
+				f = checkparticularW(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
+			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 0 and x[i+p][j+p] > 0:
+				f = checkparticularW(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
+				break
+			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 1:
+				break
+		for p in range(1,8):
+			if 	j-p>-1 and i-p>-1 and x[i-p][j-p] == 0:
+				f = checkparticularW(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
+			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 0 and x[i-p][j-p] > 0:
+				f = checkparticularW(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
+				break
+			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 1:
+				break
+		for p in range(1,8):
+			if 	i+p<8 and j-p>-1 and x[i+p][j-p] == 0:
+				f = checkparticularW(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
+			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 0 and x[i+p][j-p] > 0:
+				f = checkparticularW(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
+				break
+			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 1:
+				break
+		for p in range(1,8):
+			if 	i-p>-1 and j+p<8 and x[i-p][j+p] == 0:
+				f = checkparticularW(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
+			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 0 and x[i-p][j+p] > 0:
+				f = checkparticularW(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
+				break
+			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 1:
+				break
+
+	if x[i][j] == 10:
+		for p in range(1,8):
+			if 	j+p<8 and i+p<8 and x[i+p][j+p] == 0:
+				f = checkparticularB(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
+			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 1:
+				f = checkparticularB(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
+				break
+			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 0 and x[i+p][j+p] > 0:
+				break
+		for p in range(1,8):
+			if 	i-p>-1 and j-p>-1 and x[i-p][j-p] == 0:
+				f = checkparticularB(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
+			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 1:
+				f = checkparticularB(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
+				break
+			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 0 and x[i-p][j-p] > 0:
+				break
+		for p in range(1,8):
+			if 	i+p<8 and j-p>-1 and x[i+p][j-p] == 0:
+				f = checkparticularB(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
+			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 1:
+				f = checkparticularB(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
+				break
+			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 0 and x[i+p][j-p] > 0:
+				break
+		for p in range(1,8):
+			if 	i-p>-1 and j+p<8 and x[i-p][j+p] == 0:
+				f = checkparticularB(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
+			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 1:
+				f = checkparticularB(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
+				break
+			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 0 and x[i-p][j+p] > 0:
+				break
+		for p in range(1,8):
+			if 	j+p<8 and x[i][j+p] == 0:
+				f = checkparticularB(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
+			if j+p<8 and x[i][j+p]%2 == 1:
+				f = checkparticularB(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
+				break
+			if j+p<8 and x[i][j+p]%2 == 0 and x[i][j+p] > 0:
+				break
+		for p in range(1,8):
+			if 	j-p>-1 and x[i][j-p] == 0:
+				f = checkparticularB(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
+			if j-p>-1 and x[i][j-p]%2 == 1:
+				f = checkparticularB(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
+				break
+			if j-p>-1 and x[i][j-p]%2 == 0 and x[i][j-p] > 0:
+				break
+		for p in range(1,8):
+			if 	i+p<8 and x[i+p][j] == 0:
+				f = checkparticularB(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
+			if i+p<8 and x[i+p][j]%2 == 1:
+				f = checkparticularB(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
+				break
+			if i+p<8 and x[i+p][j]%2 == 0 and x[i+p][j] > 0:
+				break
+		for p in range(1,8):
+			if 	i-p>-1 and x[i-p][j] == 0:
+				f = checkparticularB(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
+			if i-p>-1 and x[i-p][j]%2 == 1:
+				f = checkparticularB(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
+				break
+			if i-p>-1 and x[i-p][j]%2 == 0 and x[i-p][j] > 0:
+				break
+
+	if x[i][j] == 9:
+		for p in range(1,8):
+			if 	j+p<8 and i+p<8 and x[i+p][j+p] == 0:
+				f = checkparticularW(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
+			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 0 and x[i+p][j+p] > 0:
+				f = checkparticularW(i+p,j+p)
+				if f == 1:
+					y[i+p][j+p] = 1
+				break
+			if j+p<8 and i+p<8 and x[i+p][j+p]%2 == 1:
+				break
+		for p in range(1,8):
+			if 	j-p>-1 and i-p>-1 and x[i-p][j-p] == 0:
+				f = checkparticularW(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
+			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 0 and x[i-p][j-p] > 0:
+				f = checkparticularW(i-p,j-p)
+				if f == 1:
+					y[i-p][j-p] = 1
+				break
+			if j-p>-1 and i-p>-1 and x[i-p][j-p]%2 == 1:
+				break
+		for p in range(1,8):
+			if 	i+p<8 and j-p>-1 and x[i+p][j-p] == 0:
+				f = checkparticularW(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
+			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 0 and x[i+p][j-p] > 0:
+				f = checkparticularW(i+p,j-p)
+				if f == 1:
+					y[i+p][j-p] = 1
+				break
+			if i+p<8 and j-p>-1 and x[i+p][j-p]%2 == 1:
+				break
+		for p in range(1,8):
+			if 	i-p>-1 and j+p<8 and x[i-p][j+p] == 0:
+				f = checkparticularW(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
+			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 0 and x[i-p][j+p] > 0:
+				f = checkparticularW(i-p,j+p)
+				if f == 1:
+					y[i-p][j+p] = 1
+				break
+			if i-p>-1 and j+p<8 and x[i-p][j+p]%2 == 1:
+				break
+		for p in range(1,8):
+			if 	j+p<8 and x[i][j+p] == 0:
+				f = checkparticularW(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
+			if j+p<8 and x[i][j+p]%2 == 0 and x[i][j+p] > 0:
+				f = checkparticularW(i,j+p)
+				if f == 1:
+					y[i][j+p] = 1
+				break
+			if j+p<8 and x[i][j+p]%2 == 1:
+				break
+		for p in range(1,8):
+			if 	j-p>-1 and x[i][j-p] == 0:
+				f = checkparticularW(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
+			if j-p>-1 and x[i][j-p]%2 == 0 and x[i][j-p] > 0:
+				f = checkparticularW(i,j-p)
+				if f == 1:
+					y[i][j-p] = 1
+				break
+			if j-p>-1 and x[i][j-p]%2 == 1:
+				break
+		for p in range(1,8):
+			if 	i+p<8 and x[i+p][j] == 0:
+				f = checkparticularW(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
+			if i+p<8 and x[i+p][j]%2 == 0 and x[i+p][j] > 0:
+				f = checkparticularW(i+p,j)
+				if f == 1:
+					y[i+p][j] = 1
+				break
+			if i+p<8 and x[i+p][j]%2 == 1:
+				break
+		for p in range(1,8):
+			if 	i-p>-1 and x[i-p][j] == 0:
+				f = checkparticularW(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
+			if i-p>-1 and x[i-p][j]%2 == 0 and x[i-p][j] > 0:
+				f = checkparticularW(i-p,j)
+				if f == 1:
+					y[i-p][j] = 1
+				break
+			if i-p>-1 and x[i-p][j]%2 == 1:
+				break
+
+	if x[i][j] == 12:
+		if 	j+1<8 and i+1<8 and (x[i+1][j+1] == 0 or x[i+1][j+1]%2 == 1):
+			f = checkparticularB(i+1,j+1)
+			if f == 1:
+				y[i+1][j+1] = 1
+
+		if 	i-1>-1 and j-1>-1 and (x[i-1][j-1] == 0 or x[i-1][j-1]%2 == 1):
+			f = checkparticularB(i-1,j-1)
+			if f == 1:
+				y[i-1][j-1] = 1
+
+		if 	i+1<8 and j-1>-1 and (x[i+1][j-1] == 0 or x[i+1][j-1]%2 == 1):
+			f = checkparticularB(i+1,j-1)
+			if f == 1:
+				y[i+1][j-1] = 1
+
+		if 	i-1>-1 and j+1<8 and (x[i-1][j+1] == 0 or x[i-1][j+1]%2 == 1):
+			f = checkparticularB(i-1,j+1)
+			if f == 1:
+				y[i-1][j+1] = 1
+
+		if 	j+1<8 and (x[i][j+1] == 0 or x[i][j+1]%2 == 1):
+			f = checkparticularB(i,j+1)
+			if f == 1:
+				y[i][j+1] = 1
+
+		if 	j-1>-1 and (x[i][j-1] == 0 or x[i][j-1]%2 == 1):
+			f = checkparticularB(i,j-1)
+			if f == 1:
+				y[i][j-1] = 1
+
+		if 	i+1<8 and (x[i+1][j] == 0 or x[i+1][j]%2 == 1):
+			f = checkparticularB(i+1,j)
+			if f == 1:
+				y[i+1][j+1] = 1
+
+		if 	i-1>-1 and (x[i-1][j] == 0 or x[i-1][j]%2 == 1):
+			f = checkparticularB(i-1,j)
+			if f == 1:
+				y[i-1][j] = 1
+
+		if i == 4 and j == 0 and x[i-1][j] == 0 and x[i-2][j] == 0 and x[i-3][j] == 0 and x[i-4][j] == 4:
+			y[i-3][j] = 2
+		if i == 4 and j == 0 and x[i+1][j] == 0 and x[i+2][j] == 0 and x[i+3][j] == 4:
+			y[i+2][j] = 4
+
+	if x[i][j] == 11:
+		if 	j+1<8 and i+1<8 and x[i+1][j+1]%2 == 0:
+			f = checkparticularW(i+1,j+1)
+			if f == 1:
+				y[i+1][j+1] = 1
+
+		if 	i-1>-1 and j-1>-1 and x[i-1][j-1]%2 == 0:
+			f = checkparticularW(i-1,j-1)
+			if f == 1:
+				y[i-1][j-1] = 1
+
+		if i+1<8 and j-1>-1 and x[i+1][j-1]%2 == 0:
+			f = checkparticularW(i+1,j-1)
+			if f == 1:
+				y[i+1][j-1] = 1
+
+		if i-1>-1 and j+1<8 and x[i-1][j+1]%2 == 0:
+			f = checkparticularW(i-1,j+1)
+			if f == 1:
+				y[i-1][j+1] = 1
+
+		if j+1<8 and x[i][j+1]%2 == 0:
+			f = checkparticularW(i,j+1)
+			if f == 1:
+				y[i][j+1] = 1
+
+		if j-1>-1 and x[i][j-1]%2 == 0:
+			f = checkparticularW(i,j-1)
+			if f == 1:
+				y[i][j-1] = 1
+
+		if i+1<8 and x[i+1][j]%2 == 0:
+			f = checkparticularW(i+1,j)
+			if f == 1:
+				y[i+1][j] = 1
+
+		if i-1>-1 and x[i-1][j]%2 == 0:
+			f = checkparticularW(i-1,j)
+			if f == 1:
+				y[i-1][j] = 1
+
+		if i == 4 and j == 7 and x[i-1][j] == 0 and x[i-2][j] == 0 and x[i-3][j] == 0 and x[i-4][j] == 3:
+			y[i-3][j] = 3
+		if i == 4 and j == 7 and x[i+1][j] == 0 and x[i+2][j] == 0 and x[i+3][j] == 3:
+			y[i+2][j] = 5
+
+	safeToMove = True
+
+	if relativePosOfKing != "NotRelated":
+		pass
+
+	if relativePosOfKing == "RelatedFromDown":
+		for rowIter in range(i-1, -1, -1):
+			if x[rowIter][j] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
+				safeToMove = False
+				break
+			elif x[rowIter][j] != 0:
+				break
+		if not safeToMove:
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if colIter != j:
+						y[rowIter][colIter] = 0
+	if relativePosOfKing == "RelatedFromUp":
+		for rowIter in range(i, 7):
+			if x[rowIter][j] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
+				safeToMove = False
+				break
+			elif x[rowIter][j] != 0:
+				break
+		if not safeToMove:
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if colIter != j:
+						y[rowIter][colIter] = 0
+	if relativePosOfKing == "RelatedFromRight":
+		for colIter in range(j-1, -1, -1):
+			if x[i][colIter] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
+				safeToMove = False
+				break
+			elif x[i][colIter] != 0:
+				break
+		if not safeToMove:
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter != i:
+						y[rowIter][colIter] = 0
+	if relativePosOfKing == "RelatedFromLeft":
+		for colIter in range(j+1, 8):
+			if x[i][colIter] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
+				safeToMove = False
+				break
+			elif x[i][colIter] != 0:
+				break
+		if not safeToMove:
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter != i:
+						y[rowIter][colIter] = 0		
+	if relativePosOfKing == "RelatedFromDownRight":
+		for rowIter in range(i-1, -1, -1):
+			for colIter in range(j-1, -1, -1):
+				if rowIter - colIter == i - j and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
+					safeToMove = False
+					break
+				elif rowIter - colIter == i - j and x[rowIter][colIter] != 0:
+					break
+		if not safeToMove:
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter - colIter != i - j:
+						y[rowIter][colIter] = 0
+	if relativePosOfKing == "RelatedFromUpLeft":
+		for rowIter in range(i+1, 8):
+			for colIter in range(j+1, 8):
+				if rowIter - colIter == i - j and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
+					safeToMove = False
+					break
+				elif rowIter - colIter == i - j and x[rowIter][colIter] != 0:
+					break
+		if not safeToMove:
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter - colIter != i - j:
+						y[rowIter][colIter] = 0
+	if relativePosOfKing == "RelatedFromUpRight":
+		for rowIter in range(i, 8):
+			for colIter in range(j-1, -1, -1):
+				if rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
+					safeToMove = False
+					break
+				elif rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] != 0:
+					break
+		if not safeToMove:
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter - i != -1 * (colIter - j):
+						y[rowIter][colIter] = 0
+	if relativePosOfKing == "RelatedFromDownLeft":
+		for rowIter in range(i-1, -1, -1):
+			for colIter in range(j, 8):
+				if rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
+					safeToMove = False
+					break
+				elif rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] != 0:
+					break
+		if not safeToMove:
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter - i != -1 * (colIter - j):
+						y[rowIter][colIter] = 0
+	
+	if (isWhiteCheck or isblackCheck) and x[i][j] not in [11, 12]:
+		kingIsCheckedFrom = ""
+		for rowIter in range(0, 8):
+			for colIter in range(0, 8):
+				if (x[rowIter][colIter] == 11 and isWhiteCheck) or (x[rowIter][colIter] == 12 and isblackCheck):
+					kingX = rowIter
+					kingY = colIter
+					break
+			else:
+				continue
+			break
+
+		for rowIter in range(kingX + 1, 8):
+			if x[rowIter][kingY] in [9 + x[i][j] % 2, 3 + x[i][j] % 2]:
+				kingIsCheckedFrom = kingIsCheckedFrom + "|Down|"
+				checkFromX = rowIter
+				checkFromY = kingY
+				break
+			elif x[rowIter][kingY] != 0:
+				break
+		for rowIter in range(kingX - 1, -1, -1):
+			if x[rowIter][kingY] in [9 + x[i][j] % 2, 3 + x[i][j] % 2]:
+				kingIsCheckedFrom = kingIsCheckedFrom + "|Up|"
+				checkFromX = rowIter
+				checkFromY = kingY
+				break
+			elif x[rowIter][kingY] != 0:
+				break
+		for colIter in range(kingY + 1, 8):
+			if x[kingX][colIter] in [9 + x[i][j] % 2, 3 + x[i][j] % 2]:
+				kingIsCheckedFrom = kingIsCheckedFrom + "|Right|"
+				checkFromX = kingX
+				checkFromY = colIter
+				break
+			elif x[kingX][colIter] != 0:
+				break
+		for colIter in range(kingY - 1, -1, -1):
+			if x[kingX][colIter] in [9 + x[i][j] % 2, 3 + x[i][j] % 2]:
+				kingIsCheckedFrom = kingIsCheckedFrom + "|Left|"
+				checkFromX = kingX
+				checkFromY = colIter
+				break
+			elif x[kingX][colIter] != 0:
+				break
+		for rowIter in range(kingX + 1, 8):
+			for colIter in range(kingY + 1, 8):
+				if rowIter - colIter == kingX - kingY and x[rowIter][colIter] in [9 + x[i][j] % 2, 7 + x[i][j] % 2]:
+					kingIsCheckedFrom = kingIsCheckedFrom + "|DownRight|"
+					checkFromX = rowIter
+					checkFromY = colIter
+					break
+				elif rowIter - colIter == kingX - kingY and x[rowIter][colIter] != 0:
+					break
+			else:
+				continue
+			break
+		for rowIter in range(kingX - 1, -1, -1):
+			for colIter in range(kingY - 1, -1, -1):
+				if rowIter - colIter == kingX - kingY and x[rowIter][colIter] in [9 + x[i][j] % 2, 7 + x[i][j] % 2]:
+					kingIsCheckedFrom = kingIsCheckedFrom + "|UpLeft|"
+					checkFromX = rowIter
+					checkFromY = colIter
+					break
+				elif rowIter - colIter == kingX - kingY and x[rowIter][colIter] != 0:
+					break
+			else:
+				continue
+			break
+		for rowIter in range(kingX + 1, 8):
+			for colIter in range(kingY - 1, -1, -1):
+				if rowIter - kingX == -1 * (colIter - kingY) and x[rowIter][colIter] in [9 + x[i][j] % 2, 7 + x[i][j] % 2]:
+					kingIsCheckedFrom = kingIsCheckedFrom + "|DownLeft|"
+					checkFromX = rowIter
+					checkFromY = colIter
+					break
+				elif rowIter - kingX == -1 * (colIter - kingY) and x[rowIter][colIter] != 0:
+					break
+			else:
+				continue
+			break
+		for rowIter in range(kingX - 1, -1, -1):
+			for colIter in range(kingY + 1, 8):
+				if rowIter - kingX == -1 * (colIter - kingY) and x[rowIter][colIter] in [9 + x[i][j] % 2, 7 + x[i][j] % 2]:
+					kingIsCheckedFrom = kingIsCheckedFrom + "|UpRight|"
+					checkFromX = rowIter
+					checkFromY = colIter
+					break
+				elif rowIter - kingX == -1 * (colIter - kingY) and x[rowIter][colIter] != 0:
+					break
+			else:
+				continue
+			break
+		if kingX+2<8 and kingY+1<8 and x[kingX+2][kingY+1] == 5 + x[i][j] % 2:
+			kingIsCheckedFrom = kingIsCheckedFrom + "|Down2Right1|"
+		if kingX+2<8 and kingY-1>-1 and x[kingX+2][kingY-1] == 5 + x[i][j] % 2:
+			kingIsCheckedFrom = kingIsCheckedFrom + "|Down2Left1|"
+		if kingX-2>-1 and kingY+1<8 and x[kingX-2][kingY+1] == 5 + x[i][j] % 2:
+			kingIsCheckedFrom = kingIsCheckedFrom + "|Up2Right1|"
+		if kingX-2>-1 and kingY-1>-1 and x[kingX-2][kingY-1] == 5 + x[i][j] % 2:
+			kingIsCheckedFrom = kingIsCheckedFrom + "|Up2Left1|"
+		if kingX+1<8 and kingY+2<8 and x[kingX+1][kingY+2] == 5 + x[i][j] % 2:
+			kingIsCheckedFrom = kingIsCheckedFrom + "|Down1Right2|"
+		if kingX+1<8 and kingY-2>-1 and x[kingX+1][kingY-2] == 5 + x[i][j] % 2:
+			kingIsCheckedFrom = kingIsCheckedFrom + "|Down1Left2|"
+		if kingX-1>-1 and kingY+2<8 and x[kingX-1][kingY+2] == 5 + x[i][j] % 2:
+			kingIsCheckedFrom = kingIsCheckedFrom + "|Up1Right2|"
+		if kingX-1>-1 and kingY-2>-1 and x[kingX-1][kingY-2] == 5 + x[i][j] % 2:
+			kingIsCheckedFrom = kingIsCheckedFrom + "|Up1Left2|"
+
+		if kingIsCheckedFrom.count("|") > 2:
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|Down|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if kingY != colIter or rowIter < kingX or rowIter > checkFromX:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|Up|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if kingY != colIter or rowIter > kingX or rowIter < checkFromX:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|Right|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if kingX != rowIter or colIter < kingY or colIter > checkFromY:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|Left|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if kingX != rowIter or colIter > kingY or colIter < checkFromY:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|DownRight|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if colIter < kingY or rowIter < kingX or kingX - kingY != rowIter-colIter or rowIter > checkFromX or colIter > checkFromY:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|UpLeft|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if colIter > kingY or rowIter > kingX or kingX - kingY != rowIter-colIter or rowIter < checkFromX or colIter < checkFromY:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|DownLeft|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if colIter > kingY or rowIter < kingX or kingX - rowIter != -1 * (kingY-colIter) or rowIter > checkFromX or colIter < checkFromY:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|UpRight|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if colIter < kingY or rowIter > kingY or kingX - rowIter != -1 * (kingY-colIter) or rowIter < checkFromX or colIter > checkFromY:
+						y[rowIter][colIter] = 0
+		
+		elif kingIsCheckedFrom == "|Down2Right1|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter != kingX + 2 or colIter != kingY + 1:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|Down2Left1|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter != kingX + 2 or colIter != kingY - 1:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|Up2Right1|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter != kingX - 2 or colIter != kingY + 1:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|Up2Left1|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter != kingX - 2 or colIter != kingY - 1:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|Down1Right2|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter != kingX + 1 or colIter != kingY + 2:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|Down1Left2|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter != kingX + 1 or colIter != kingY1 - 2:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|Up1Right2|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter != kingX - 1 or colIter != kingY + 2:
+						y[rowIter][colIter] = 0
+		elif kingIsCheckedFrom == "|Up1Left2|":
+			for rowIter in range(0, 8):
+				for colIter in range(0, 8):
+					if rowIter != kingX - 1 or colIter != kingY - 2:
+						y[rowIter][colIter] = 0
+
+	isValidMove = False
+	for rowIter in range(0, 8):
+		for colIter in range(0, 8):
+			if( y[rowIter][colIter] == 1):
+				isValidMove = True
+				break
+
+
+	if not isValidMove:
+		getAvailable(x, i,j,x1,y1,x2,y2)
+
+def getAvailable(x, i,j,x1,y1,x2,y2):
+	global isWhiteCheck
+	global isblackCheck
+
+	relativePosOfKing = "NotRelated"
+	if x[i][j]%2 == 0:
+		kingValue = 12
+	else:
+		kingValue = 11
+		
+	for rowIter in range(i + 1, 8):
+		if x[rowIter][j] == kingValue:
+			relativePosOfKing = "RelatedFromDown"
+			break
+		elif x[rowIter][j] != 0:
+			break
+	for rowIter in range(i-1, -1, -1):
+		if x[rowIter][j] == kingValue:
+			relativePosOfKing = "RelatedFromUp"
+			break
+		elif x[rowIter][j] != 0:
+			break
+	for colIter in range(j + 1, 8):
+		if x[i][colIter] == kingValue:
+			relativePosOfKing = "RelatedFromRight"
+			break
+		elif x[i][colIter] != 0:
+			break
+	for colIter in range(j-1, -1, -1):
+		if x[i][colIter] == kingValue:
+			relativePosOfKing = "RelatedFromLeft"
+			break
+		elif x[i][colIter] != 0:
+			break
+	for rowIter in range(i + 1, 8):
+		for colIter in range(j + 1, 8):
+			if rowIter - colIter == i - j and x[rowIter][colIter] == kingValue:
+				relativePosOfKing = "RelatedFromDownRight"
+				break
+			elif rowIter - colIter == i - j and x[rowIter][colIter] != 0:
+				break
+		else:
+			continue
+		break
+	for rowIter in range(i-1, -1, -1):
+		for colIter in range(j-1, -1, -1):
+			if rowIter - colIter == i - j and x[rowIter][colIter] == kingValue:
+				relativePosOfKing = "RelatedFromUpLeft"
+				break
+			elif rowIter - colIter == i - j and x[rowIter][colIter] != 0:
+				break
+		else:
+			continue
+		break
+	for rowIter in range(i-1, -1, -1):
+		for colIter in range(j + 1, 8):
+			if rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] == kingValue:
+				relativePosOfKing = "RelatedFromUpRight"
+				break
+			elif rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] != 0:
+				break
+		else:
+			continue
+		break
+	for rowIter in range(i + 1, 8):
+		for colIter in range(j-1, -1, -1):
+			if rowIter - i == -1 * (colIter - j) and  x[rowIter][colIter] == kingValue:
 				relativePosOfKing = "RelatedFromDownLeft"
 				break
 			elif rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] != 0:
@@ -358,7 +1383,7 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 			y[i][j+1]=1
 		if j == 1 and y[i][j+2] == 0 and x[i][j+2] == 0:
 			y[i][j+2]=1
-		if i < 7:
+		if i < 7:	
 			if x[i+1][j+1]%2 == 1:
 				y[i+1][j+1]=1
 		if i-1>-1:
@@ -372,13 +1397,13 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 		if j == 6 and i-1>-1:
 			if x[i-1][j+1]%2 == 1:
 				y[i-1][j+1]=6
-
+	
 	if x[i][j] == 1:
 		if y[i][j-1] == 0 and x[i][j-1] == 0:
 			y[i][j-1]=1
 		if j == 6 and y[i][j-2] == 0 and x[i][j-2] == 0:
 			y[i][j-2]=1
-		if i-1>-1:
+		if i-1>-1:	
 			if x[i-1][j-1]%2 == 0 and x[i-1][j-1] > 0:
 				y[i-1][j-1]=1
 		if i < 7:
@@ -718,42 +1743,42 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 			f = checkparticularB(i+1,j+1)
 			if f == 1:
 				y[i+1][j+1] = 1
-
+		
 		if 	i-1>-1 and j-1>-1 and (x[i-1][j-1] == 0 or x[i-1][j-1]%2 == 1):
 			f = checkparticularB(i-1,j-1)
 			if f == 1:
 				y[i-1][j-1] = 1
-
+		
 		if 	i+1<8 and j-1>-1 and (x[i+1][j-1] == 0 or x[i+1][j-1]%2 == 1):
 			f = checkparticularB(i+1,j-1)
 			if f == 1:
 				y[i+1][j-1] = 1
-
+		
 		if 	i-1>-1 and j+1<8 and (x[i-1][j+1] == 0 or x[i-1][j+1]%2 == 1):
 			f = checkparticularB(i-1,j+1)
 			if f == 1:
 				y[i-1][j+1] = 1
-
+		
 		if 	j+1<8 and (x[i][j+1] == 0 or x[i][j+1]%2 == 1):
 			f = checkparticularB(i,j+1)
 			if f == 1:
 				y[i][j+1] = 1
-
+		
 		if 	j-1>-1 and (x[i][j-1] == 0 or x[i][j-1]%2 == 1):
 			f = checkparticularB(i,j-1)
 			if f == 1:
 				y[i][j-1] = 1
-
+		
 		if 	i+1<8 and (x[i+1][j] == 0 or x[i+1][j]%2 == 1):
 			f = checkparticularB(i+1,j)
 			if f == 1:
 				y[i+1][j+1] = 1
-
+		
 		if 	i-1>-1 and (x[i-1][j] == 0 or x[i-1][j]%2 == 1):
 			f = checkparticularB(i-1,j)
 			if f == 1:
 				y[i-1][j] = 1
-
+		
 		if i == 4 and j == 0 and x[i-1][j] == 0 and x[i-2][j] == 0 and x[i-3][j] == 0 and x[i-4][j] == 4:
 			y[i-3][j] = 2
 		if i == 4 and j == 0 and x[i+1][j] == 0 and x[i+2][j] == 0 and x[i+3][j] == 4:
@@ -769,32 +1794,32 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 			f = checkparticularW(i-1,j-1)
 			if f == 1:
 				y[i-1][j-1] = 1
-
+		
 		if i+1<8 and j-1>-1 and x[i+1][j-1]%2 == 0:
 			f = checkparticularW(i+1,j-1)
 			if f == 1:
 				y[i+1][j-1] = 1
-
+		
 		if i-1>-1 and j+1<8 and x[i-1][j+1]%2 == 0:
 			f = checkparticularW(i-1,j+1)
 			if f == 1:
 				y[i-1][j+1] = 1
-
+		
 		if j+1<8 and x[i][j+1]%2 == 0:
 			f = checkparticularW(i,j+1)
 			if f == 1:
 				y[i][j+1] = 1
-
+		
 		if j-1>-1 and x[i][j-1]%2 == 0:
 			f = checkparticularW(i,j-1)
 			if f == 1:
 				y[i][j-1] = 1
-
+		
 		if i+1<8 and x[i+1][j]%2 == 0:
 			f = checkparticularW(i+1,j)
 			if f == 1:
 				y[i+1][j] = 1
-
+		
 		if i-1>-1 and x[i-1][j]%2 == 0:
 			f = checkparticularW(i-1,j)
 			if f == 1:
@@ -808,23 +1833,11 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 	safeToMove = True
 
 	if relativePosOfKing != "NotRelated":
-		#print("relation with respect to board")
-		#print(x)
-		#print("for piece")
-		#print(x[i][j])
-		#print("and position")
-		#print(str(i) + " , " + str(j))
 		pass
 
 	if relativePosOfKing == "RelatedFromDown":
 		for rowIter in range(i-1, -1, -1):
 			if x[rowIter][j] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
-				#print("piece creating danger")
-				#print(x[rowIter][j])
-				#print("at position")
-				#print(str(rowIter) + " , " + str(j))
-				#print("y before modification is")
-				#print(y)
 				safeToMove = False
 				break
 			elif x[rowIter][j] != 0:
@@ -837,12 +1850,6 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 	if relativePosOfKing == "RelatedFromUp":
 		for rowIter in range(i, 7):
 			if x[rowIter][j] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
-				#print("piece creating danger")
-				#print(x[rowIter][j])
-				#print("at position")
-				#print(str(rowIter) + " , " + str(j))
-				#print("y before modification is")
-				#print(y)
 				safeToMove = False
 				break
 			elif x[rowIter][j] != 0:
@@ -855,12 +1862,6 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 	if relativePosOfKing == "RelatedFromRight":
 		for colIter in range(j-1, -1, -1):
 			if x[i][colIter] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
-				#print("piece creating danger")
-				#print(x[i][colIter])
-				#print("at position")
-				#print(str(i) + " , " + str(colIter))
-				#print("y before modification is")
-				#print(y)
 				safeToMove = False
 				break
 			elif x[i][colIter] != 0:
@@ -873,12 +1874,6 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 	if relativePosOfKing == "RelatedFromLeft":
 		for colIter in range(j+1, 8):
 			if x[i][colIter] in [9 + x[i][j]%2, 3 + x[i][j]%2]:
-				#print("piece creating danger")
-				#print(x[i][colIter])
-				#print("at position")
-				#print(str(i) + " , " + str(colIter))
-				#print("y before modification is")
-				#print(y)
 				safeToMove = False
 				break
 			elif x[i][colIter] != 0:
@@ -887,24 +1882,15 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 			for rowIter in range(0, 8):
 				for colIter in range(0, 8):
 					if rowIter != i:
-						y[rowIter][colIter] = 0
+						y[rowIter][colIter] = 0		
 	if relativePosOfKing == "RelatedFromDownRight":
 		for rowIter in range(i-1, -1, -1):
 			for colIter in range(j-1, -1, -1):
 				if rowIter - colIter == i - j and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
-					#print("piece creating danger")
-					#print(x[rowIter][colIter])
-					#print("at position")
-					#print(str(rowIter) + " , " + str(colIter))
-					#print("y before modification is")
-					#print(y)
 					safeToMove = False
 					break
 				elif rowIter - colIter == i - j and x[rowIter][colIter] != 0:
 					break
-			# else:
-			# 	continue
-			# break
 		if not safeToMove:
 			for rowIter in range(0, 8):
 				for colIter in range(0, 8):
@@ -914,19 +1900,10 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 		for rowIter in range(i+1, 8):
 			for colIter in range(j+1, 8):
 				if rowIter - colIter == i - j and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
-					#print("piece creating danger")
-					#print(x[rowIter][colIter])
-					#print("at position")
-					#print(str(rowIter) + " , " + str(colIter))
-					#print("y before modification is")
-					#print(y)
 					safeToMove = False
 					break
 				elif rowIter - colIter == i - j and x[rowIter][colIter] != 0:
 					break
-			# else:
-			# 	continue
-			# break
 		if not safeToMove:
 			for rowIter in range(0, 8):
 				for colIter in range(0, 8):
@@ -936,19 +1913,10 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 		for rowIter in range(i, 8):
 			for colIter in range(j-1, -1, -1):
 				if rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
-					#print("piece creating danger")
-					#print(x[rowIter][colIter])
-					#print("at position")
-					#print(str(rowIter) + " , " + str(colIter))
-					#print("y before modification is")
-					#print(y)
 					safeToMove = False
 					break
 				elif rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] != 0:
 					break
-			# else:
-			# 	continue
-			# break
 		if not safeToMove:
 			for rowIter in range(0, 8):
 				for colIter in range(0, 8):
@@ -958,25 +1926,16 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 		for rowIter in range(i-1, -1, -1):
 			for colIter in range(j, 8):
 				if rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] in [9 + x[i][j]%2, 7 + x[i][j]%2]:
-					#print("piece creating danger")
-					#print(x[rowIter][colIter])
-					#print("at position")
-					#print(str(rowIter) + " , " + str(colIter))
-					#print("y before modification is")
-					#print(y)
 					safeToMove = False
 					break
 				elif rowIter - i == -1 * (colIter - j) and x[rowIter][colIter] != 0:
 					break
-			# else:
-			# 	continue
-			# break
 		if not safeToMove:
 			for rowIter in range(0, 8):
 				for colIter in range(0, 8):
 					if rowIter - i != -1 * (colIter - j):
 						y[rowIter][colIter] = 0
-
+	
 	if (isWhiteCheck or isblackCheck) and x[i][j] not in [11, 12]:
 		kingIsCheckedFrom = ""
 		for rowIter in range(0, 8):
@@ -1130,7 +2089,7 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 				for colIter in range(0, 8):
 					if colIter < kingY or rowIter > kingY or kingX - rowIter != -1 * (kingY-colIter) or rowIter < checkFromX or colIter > checkFromY:
 						y[rowIter][colIter] = 0
-
+		
 		elif kingIsCheckedFrom == "|Down2Right1|":
 			for rowIter in range(0, 8):
 				for colIter in range(0, 8):
@@ -1172,7 +2131,7 @@ def getAvailable(x, i,j,x1,y1,x2,y2):
 					if rowIter != kingX - 1 or colIter != kingY - 2:
 						y[rowIter][colIter] = 0
 
-
+			
 def checkparticularB(i,j):
 	c=0
 	f=0
@@ -1418,42 +2377,42 @@ def showAvailable():
 				sq3.draw(win)
 
 def blackAvail(i,j):
-	count = 0
+	count = 0 
 	if 	j+1<8 and i+1<8 and (x[i+1][j+1] == 0 or x[i+1][j+1]%2 == 1):
 		f = checkparticularB(i+1,j+1)
 		if f == 1:
 			count = count+1
-
+		
 	if 	i-1>-1 and j-1>-1 and (x[i-1][j-1] == 0 or x[i-1][j-1]%2 == 1):
 		f = checkparticularB(i-1,j-1)
 		if f == 1:
 			count = count+1
-
+		
 	if 	i+1<8 and j-1>-1 and (x[i+1][j-1] == 0 or x[i+1][j-1]%2 == 1):
 		f = checkparticularB(i+1,j-1)
 		if f == 1:
 			count = count+1
-
+		
 	if 	i-1>-1 and j+1<8 and (x[i-1][j+1] == 0 or x[i-1][j+1]):
 		f = checkparticularB(i+1,j+1)
 		if f == 1:
 			count = count+1
-
+		
 	if 	j+1<8 and (x[i][j+1] == 0 or x[i][j+1]%2 == 1):
 		f = checkparticularB(i,j+1)
 		if f == 1:
 			count = count+1
-
+		
 	if 	j-1>-1 and (x[i][j-1] == 0 or x[i][j-1]%2 == 1):
 		f = checkparticularB(i,j-1)
 		if f == 1:
 			count = count+1
-
+		
 	if 	i+1<8 and (x[i+1][j] == 0 or x[i+1][j]%2 == 1):
 		f = checkparticularB(i+1,j)
 		if f == 1:
 			count = count+1
-
+		
 	if 	i-1>-1 and (x[i-1][j] == 0 or x[i-1][j]%2 == 1):
 		f = checkparticularB(i-1,j)
 		if f == 1:
@@ -1467,47 +2426,47 @@ def blackAvail(i,j):
 		txt9 = Text(Point(500,600), "Player 2's checkmate\nPlayer 1 wins")
 		txt9.setSize(30)
 		txt9.setTextColor(color_rgb(57,255,20))
-		txt9.draw(win)
+		txt9.draw(win)		
 		win.getMouse()
 		win.close()
-
+	
 def whiteAvail(i,j):
 	count = 0
 	if 	j+1<8 and i+1<8 and x[i+1][j+1]%2 == 0:
 		f = checkparticularW(i+1,j+1)
-		if f == 1:
+		if f == 1:				
 			count = count+1
 
 	if 	i-1>-1 and j-1>-1 and x[i-1][j-1]%2 == 0:
 		f = checkparticularW(i-1,j-1)
 		if f == 1:
 			count = count+1
-
+		
 	if i+1<8 and j-1>-1 and x[i+1][j-1]%2 == 0:
 		f = checkparticularW(i+1,j-1)
 		if f == 1:
 			count = count+1
-
+		
 	if i-1>-1 and j+1<8 and x[i-1][j+1]%2 == 0:
 		f = checkparticularW(i-1,j+1)
 		if f == 1:
 			count = count+1
-
+		
 	if j+1<8 and x[i][j+1]%2 == 0:
 		f = checkparticularW(i,j+1)
 		if f == 1:
 			count = count+1
-
+		
 	if j-1>-1 and x[i][j-1]%2 == 0:
 		f = checkparticularW(i,j-1)
 		if f == 1:
 			count = count+1
-
+		
 	if i+1<8 and x[i+1][j]%2 == 0:
 		f = checkparticularW(i+1,j)
 		if f == 1:
 			count = count+1
-
+		
 	if i-1>-1 and x[i-1][j]%2 == 0:
 		f = checkparticularW(i-1,j)
 		if f == 1:
@@ -1521,7 +2480,7 @@ def whiteAvail(i,j):
 		txt9 = Text(Point(500,600), "Player 1's checkmate\nPlayer 2 wins")
 		txt9.setSize(30)
 		txt9.setTextColor(color_rgb(57,255,20))
-		txt9.draw(win)
+		txt9.draw(win)		
 		win.getMouse()
 		win.close()
 
@@ -1626,7 +2585,7 @@ def cansaveW(i,j):
 	if i-1>-1 and j-2>-1 and x[i-1][j-2] == 5:
 		c=c+1
 	return c
-
+	
 def cansaveB(i,j):
 	c = 0
 	if j-1>-1:
@@ -1747,7 +2706,7 @@ def whiteCheck():
 			e = cansaveW(g+1,h+2)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 	if g+1<8 and h-2>-1:
 		if x[g+1][h-2] == 6:
 			sq3 = Rectangle(Point(0+(g*80),0+(h*80)),Point(80+(g*80),80+(h*80)))
@@ -1758,7 +2717,7 @@ def whiteCheck():
 			e = cansaveW(g+1,h-2)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 	if g+2<8 and h+1<8:
 		if x[g+2][h+1] == 6:
 			sq3 = Rectangle(Point(0+(g*80),0+(h*80)),Point(80+(g*80),80+(h*80)))
@@ -1769,7 +2728,7 @@ def whiteCheck():
 			e = cansaveW(g+2,h+1)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 	if g+2<8 and h-1>-1:
 		if x[g+2][h-1] == 6:
 			sq3 = Rectangle(Point(0+(g*80),0+(h*80)),Point(80+(g*80),80+(h*80)))
@@ -1780,7 +2739,7 @@ def whiteCheck():
 			e = cansaveW(g+2,h-1)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 	if g-1>-1 and h+2<8:
 		if x[g-1][h+2] == 6:
 			sq3 = Rectangle(Point(0+(g*80),0+(h*80)),Point(80+(g*80),80+(h*80)))
@@ -1791,7 +2750,7 @@ def whiteCheck():
 			e = cansaveW(g-1,h+2)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 	if g-1>-1 and h-2>-1:
 		if x[g-1][h-2] == 6:
 			sq3 = Rectangle(Point(0+(g*80),0+(h*80)),Point(80+(g*80),80+(h*80)))
@@ -1802,7 +2761,7 @@ def whiteCheck():
 			e = cansaveW(g-1,h-2)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 	if g-2>-1 and h+1<8:
 		if x[g-2][h+1] == 6:
 			sq3 = Rectangle(Point(0+(g*80),0+(h*80)),Point(80+(g*80),80+(h*80)))
@@ -1813,7 +2772,7 @@ def whiteCheck():
 			e = cansaveW(g-2,h+1)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 	if g-2>-1 and h-1>-1:
 		if x[g-2][h-1] == 6:
 			sq3 = Rectangle(Point(0+(g*80),0+(h*80)),Point(80+(g*80),80+(h*80)))
@@ -1824,7 +2783,7 @@ def whiteCheck():
 			e = cansaveW(g-2,h-1)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 	if g-1>-1 and h-1>-1:
 		if x[g-1][h-1] == 2:
 			sq3 = Rectangle(Point(0+(g*80),0+(h*80)),Point(80+(g*80),80+(h*80)))
@@ -1835,7 +2794,7 @@ def whiteCheck():
 			e = cansaveW(g-1,h-1)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 	if g+1<8 and h-1>-1:
 		if x[g+1][h-1] == 2:
 			sq3 = Rectangle(Point(0+(g*80),0+(h*80)),Point(80+(g*80),80+(h*80)))
@@ -1846,7 +2805,7 @@ def whiteCheck():
 			e = cansaveW(g+1,h-1)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 	for p in range(1,8):
 		if 	h+p<8:
 			if (x[g][h+p] == 4 or x[g][h+p] == 10):
@@ -1855,11 +2814,11 @@ def whiteCheck():
 				sq3.setOutline('red')
 				sq3.draw(win)
 				isCheck = True
-				for y in range(1,p):
+				for y in range(1,p):	
 					e = e + cansaveW(g,h+y)
 				if e == 0:
 					whiteAvail(g,h)
-
+			
 			break
 		if h+p<8 and x[g][h+p]%2 == 1:
 			break
@@ -1872,11 +2831,11 @@ def whiteCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g,h-y)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 			break
 		if h-p>-1 and x[g][h-p]%2 == 1:
 			break
@@ -1889,11 +2848,11 @@ def whiteCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g+y,h)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 			break
 		if g+p<8 and x[g+p][h]%2 == 1:
 			break
@@ -1906,11 +2865,11 @@ def whiteCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g-y,h)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 			break
 		if g-p>-1 and x[g-p][h]%2 == 1:
 			break
@@ -1923,11 +2882,11 @@ def whiteCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g+y,h+y)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 			break
 		if h+p<8 and g+p<8 and x[g+p][h+p]%2 == 1:
 			break
@@ -1940,7 +2899,7 @@ def whiteCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g-y,h-y)
 			if e == 0:
 					whiteAvail(g,h)
@@ -1956,11 +2915,11 @@ def whiteCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g+y,h-y)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 			break
 		if g+p<8 and h-p>-1 and x[g+p][h-p]%2 == 1:
 			break
@@ -1973,11 +2932,11 @@ def whiteCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g-y,h+y)
 			if e == 0:
 				whiteAvail(g,h)
-
+			
 			break
 		if g-p>-1 and h+p<8 and x[g-p][h+p]%2 == 1:
 			break
@@ -2100,7 +3059,7 @@ def blackCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g,h+y)
 			if e == 0:
 				blackAvail(g,h)
@@ -2116,7 +3075,7 @@ def blackCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g,h-y)
 			if e == 0:
 				blackAvail(g,h)
@@ -2132,7 +3091,7 @@ def blackCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g+y,h)
 			if e == 0:
 				blackAvail(g,h)
@@ -2148,7 +3107,7 @@ def blackCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g-y,h)
 			if e == 0:
 				blackAvail(g,h)
@@ -2164,7 +3123,7 @@ def blackCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g+y,h+y)
 			if e == 0:
 				blackAvail(g,h)
@@ -2180,7 +3139,7 @@ def blackCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g-y,h-y)
 			if e == 0:
 				blackAvail(g,h)
@@ -2196,7 +3155,7 @@ def blackCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g+y,h-y)
 			if e == 0:
 				blackAvail(g,h)
@@ -2212,7 +3171,7 @@ def blackCheck():
 			sq3.setOutline('red')
 			sq3.draw(win)
 			isCheck = True
-			for y in range(1,p):
+			for y in range(1,p):	
 				e = e + cansaveW(g-y,h+y)
 			if e == 0:
 				blackAvail(g,h)
@@ -2222,26 +3181,114 @@ def blackCheck():
 		if g-p>-1 and h+p<8 and x[g-p][h+p]%2 == 1 and x[g-p][h+p] != 7 and x[g-p][h+p] != 9:
 			break
 	return isCheck
-
+	
 def getAllAvailableMoves(boardArray, color):
 	boardArrayNp = np.array(boardArray)
-	##print(boardArrayNp)
 	listOfBoards = []
 	for i in range(8):
 		for j in range(8):
 			if color == 'Black' and boardArrayNp[i][j] in [2,4,6,8,10,12]:
-				getAvailable(boardArrayNp,i, j, 0, 0, 0, 0)
+				getAvailableDerived(boardArrayNp,i, j, 0, 0, 0, 0)
 			elif color == 'White' and boardArrayNp[i][j] in [1,3,5,7,9,11]:
-				getAvailable(boardArrayNp,i, j, 0, 0, 0, 0)
+				getAvailableDerived(boardArrayNp,i, j, 0, 0, 0, 0)
 			piece = boardArrayNp[i][j]
 			for y_i in range(8):
 				for y_j in range(8):
 					boardArrayCopy = boardArrayNp.copy()
-					if y[y_i][y_j] != 0:
+					if y[y_i][y_j] == 1:
 						boardArrayCopy[y_i][y_j] = piece
 						boardArrayCopy[i][j] = 0
 						y[y_i][y_j] = 0
-						listOfBoards.append(boardArrayCopy)
+						if color == 'Black':
+							checkIfValidSymmetry = True
+							for m in range(8):
+								if(boardArrayCopy[m][2] in [1,3,5,7,9,11] or boardArrayCopy[m][3] in [1,3,5,7,9,11]):
+									checkIfValidSymmetry = False
+									break
+							if(checkIfValidSymmetry):
+								checkIfPreviousNodePresent = False
+								for nodeBoard in boardsVisited:
+									comparison = nodeBoard == boardArrayCopy
+									if(comparison.all()):
+									# 	print("***************")
+									# 	print(boardArrayCopy)
+									# 	print(nodeBoard)
+										checkIfPreviousNodePresent = True
+										break
+								if not checkIfPreviousNodePresent:
+									isSymmetricalBoard = True
+									for l in range(0, 4):
+										for m in range(0, 4):
+											if(boardArrayNp[m][l] != boardArrayNp[7-m][l]):
+												if not ((boardArrayNp[m][l] == 10 and boardArrayNp[7-m][l] == 12) or (boardArrayNp[m][l] == 12 and boardArrayNp[7-m][l] == 10)):
+													# print(boardArrayNp)
+													# print(l, " ",m )
+													isSymmetricalBoard = False
+													break
+									if isSymmetricalBoard:
+										boardArrayCopySymmetry = boardArrayNp.copy()
+										boardArrayCopySymmetry[7-y_i][y_j] = piece
+										boardArrayCopySymmetry[7-i][j] = 0
+										# print(boardArrayCopySymmetry)
+										isNodeAlreadyAvailable = False
+
+										for nodeBoard in boardsVisited:
+											comparison = nodeBoard == boardArrayCopySymmetry
+											if(comparison.all()):
+												# print(boardArrayCopySymmetry)
+												isNodeAlreadyAvailable = True
+												break
+										if not isNodeAlreadyAvailable:                                 
+											boardsVisited.append(boardArrayCopySymmetry)       
+									listOfBoards.append(boardArrayCopy)
+							else:
+								listOfBoards.append(boardArrayCopy)
+						elif color == 'White':
+							checkIfValidSymmetry = True
+							for m in range(8):
+								if(boardArrayCopy[m][4] in [2,4,6,8,10,12] or boardArrayCopy[m][5] in [2,4,6,8,10,12]):
+									checkIfValidSymmetry = False
+									break
+							if(checkIfValidSymmetry):
+								checkIfPreviousNodePresent = False
+								for nodeBoard in boardsVisited:
+									comparison = nodeBoard == boardArrayCopy
+									if(comparison.all()):
+									# 	print("***************")
+									# 	print(boardArrayCopy)
+									# 	print(nodeBoard)
+										checkIfPreviousNodePresent = True
+										break
+								if not checkIfPreviousNodePresent:
+									isSymmetricalBoard = True
+									for l in range(0, 4):
+										for m in range(0, 4):
+											if(boardArrayNp[m][l] != boardArrayNp[7-m][l]):
+												if not ((boardArrayNp[m][l] == 11 and boardArrayNp[7-m][l] == 9) or (boardArrayNp[m][l] == 9 and boardArrayNp[7-m][l] == 11)):
+													# print(boardArrayNp)
+													# print(l, " ",m )
+													isSymmetricalBoard = False
+													break
+									if isSymmetricalBoard:
+										boardArrayCopySymmetry = boardArrayNp.copy()
+										boardArrayCopySymmetry[7-y_i][y_j] = piece
+										boardArrayCopySymmetry[7-i][j] = 0
+										# print(boardArrayCopySymmetry)
+										isNodeAlreadyAvailable = False
+
+										for nodeBoard in boardsVisited:
+											comparison = nodeBoard == boardArrayCopySymmetry
+											if(comparison.all()):
+												# print(boardArrayCopySymmetry)
+												isNodeAlreadyAvailable = True
+												break
+										if not isNodeAlreadyAvailable:                                 
+											boardsVisited.append(boardArrayCopySymmetry)       
+									listOfBoards.append(boardArrayCopy)
+							else:
+								listOfBoards.append(boardArrayCopy)
+	# print('finish',len(boardsVisited))
+	# print('bords',len(listOfBoards))
 
 	return listOfBoards
 
@@ -2251,211 +3298,62 @@ def resetMinMax():
 	maxWeight = -99999
 	minWeight = 99999
 
-# def minimax(board, depth, color):
-# 	global maxWeight
-# 	global minWeight
-# 	# global checkMateW
-# 	# global checkMateB
-# 	# #print('Called for ')
-# 	# #print(board)
-# 	# #print('with depth ')
-# 	# #print(depth)
-# 	# #print('and color')
-# 	# #print(color)
-# 	# #print(maxWeight)
-# 	# #print(minWeight)
-# 	tempboard = np.copy(board)
 
-# 	if (tuple(map(tuple, board)), depth, color) in BoardMoveWeightDict:
-# 		weight, move = BoardMoveWeightDict[(tuple(map(tuple, board)), depth, color)]
-# 		return weight, move
-# 	else:
-# 		#BoardMoveWeightDict[positionPawnW] = [positionPawnB, 200]
+def minimaxRootAB(depth, board, isMaximizing):
+    color = "White" if isMaximizing else "Black"
+    possibleMoves = getAllAvailableMoves(board, color)
+    bestMove = -9999
+    bestMoveFinal = None
+    for move in possibleMoves:
+        value = max(bestMove, minimaxFromRootAB(depth - 1, move, -10000, 10000, not isMaximizing))
+        if( value > bestMove):
+            bestMove = value
+            bestMoveFinal = move
+    return bestMoveFinal
 
-# 		if depth == 0 or checkmateW == 1 or checkmateB == 1:
-# 			##print('returning weight' + str(calculateTotalWeight(tempboard)))
-# 			weight = calculateTotalWeight(tempboard)
-# 			BoardMoveWeightDict[(tuple(map(tuple, board)), depth, color)] = [weight, tempboard]
-# 			#np.save(fileName, BoardMoveWeightDict)
-# 			return weight, tempboard
-
-# 		listOfMoves = getAllAvailableMoves(tempboard, color)
-# 		# #print('for position ')
-# 		# #print(tempboard)
-# 		# #print('available moves are')
-# 		# #print(listOfMoves)
-# 		if color == "White":
-# 			for move in listOfMoves:
-# 				weight, tboard = minimax(move, depth - 1, "Black")
-# 				#maxWeight = max(maxWeight, weight)
-# 				if weight > maxWeight:
-# 					##print('inside white if')
-# 					maxWeight = weight
-# 					tempboard = move
-# 			# 		#print('changed tempboard to ')
-# 			# 		#print(tempboard)
-# 			# #print('returning from white ')
-# 			# #print(tempboard)
-# 			weightToReturn = maxWeight
-# 			maxWeight = -99999
-# 			BoardMoveWeightDict[(tuple(map(tuple, board)), depth, color)] = [weightToReturn, tempboard]
-# 			#np.save(fileName, BoardMoveWeightDict)
-# 			return weightToReturn, tempboard
-
-# 		elif color == "Black":
-# 			for move in listOfMoves:
-# 				weight, tboard = minimax(move, depth - 1, "White")
-# 				##print(weight)
-# 				#minWeight = min(minWeight, weight)
-# 				if weight < minWeight:
-# 					##print('inside black if')
-# 					minWeight = weight
-# 					tempboard = move
-# 			# 		#print('changed tempboard to ')
-# 			# 		#print(tempboard)
-# 			# #print('returning from black ')
-# 			# #print(tempboard)
-# 			weightToReturn = minWeight
-# 			minWeight = 99999
-# 			BoardMoveWeightDict[(tuple(map(tuple, board)), depth, color)] = [weightToReturn, tempboard]
-# 			#np.save(fileName, BoardMoveWeightDict)
-# 			return weightToReturn, tempboard
-
-
-def minimaxAB(board, depth, alpha, beta, color):
-	global maxWeight
-	global minWeight
-	# global checkMateW
-	# global checkMateB
-	# #print('Called for ')
-	# #print(board)
-	# #print('with depth ')
-	# #print(depth)
-	# #print('and color')
-	# #print(color)
-	# #print(maxWeight)
-	# #print(minWeight)
-	tempboard = np.copy(board)
-
-	if (tuple(map(tuple, board)), depth, alpha, beta, color) in BoardMoveWeightDictAB:
-		weight, move = BoardMoveWeightDictAB[(tuple(map(tuple, board)), depth, alpha, beta, color)]
-		return weight, move
+def minimaxFromRootAB(depth, board, alpha, beta, is_maximizing):
+	color = "White" if is_maximizing else "Black"
+	global totalNodes
+	totalNodes = totalNodes + 1
+	if (tuple(map(tuple, board)), depth, alpha, beta, color) in BoardWeightDictAB:
+		weight = BoardWeightDictAB[(tuple(map(tuple, board)), depth, alpha, beta, color)]
+		return  weight
 	else:
-		#BoardMoveWeightDict[positionPawnW] = [positionPawnB, 200]
+	    if(depth == 0):
+	        return -1 * calculateTotalWeight(board)
+	    possibleMoves = getAllAvailableMoves(board, color)
+	    if(is_maximizing):
+	        bestMove = -9999
+	        for move in possibleMoves:
+	            bestMove = max(bestMove,minimaxFromRootAB(depth - 1, move, alpha, beta, not is_maximizing))
+	            alpha = max(alpha, bestMove)
+	            if beta <= alpha:
+	            	BoardWeightDictAB[(tuple(map(tuple, board)), depth, alpha, beta, color)] = bestMove
+	            	return bestMove
+	        BoardWeightDictAB[(tuple(map(tuple, board)), depth, alpha, beta, color)] = bestMove
+	        return bestMove
+	    else:
+	        bestMove = 9999
+	        for move in possibleMoves:
+	            bestMove = min(bestMove, minimaxFromRootAB(depth - 1, move, alpha, beta, not is_maximizing))
+	            beta = min(beta, bestMove)
+	            if beta <= alpha:
+	            	BoardWeightDictAB[(tuple(map(tuple, board)), depth, alpha, beta, color)] = bestMove
+	            	return bestMove
+	        BoardWeightDictAB[(tuple(map(tuple, board)), depth, alpha, beta, color)] = bestMove
+	        return bestMove
 
-		if depth == 0 or checkmateW == 1 or checkmateB == 1:
-			##print('returning weight' + str(calculateTotalWeight(tempboard)))
-			weight = calculateTotalWeight(tempboard)
-			BoardMoveWeightDictAB[(tuple(map(tuple, board)), depth, alpha, beta, color)] = [weight, tempboard]
-			#np.save(fileName, BoardMoveWeightDict)
-			return weight, tempboard
-
-		listOfMoves = getAllAvailableMoves(tempboard, color)
-		# #print('for position ')
-		# #print(tempboard)
-		# #print('available moves are')
-		# #print(listOfMoves)
-		if color == "White":
-			for move in listOfMoves:
-				weight, tboard = minimaxAB(move, depth - 1, alpha, beta, "Black")
-				#maxWeight = max(maxWeight, weight)
-				if weight > maxWeight:
-					##print('inside white if')
-					maxWeight = weight
-					tempboard = move
-				alpha = max(alpha, maxWeight)
-				if beta <= alpha:
-					break
-			# 		#print('changed tempboard to ')
-			# 		#print(tempboard)
-			# #print('returning from white ')
-			# #print(tempboard)
-			weightToReturn = maxWeight
-			maxWeight = -99999
-			BoardMoveWeightDictAB[(tuple(map(tuple, board)), depth, alpha, beta, color)] = [weightToReturn, tempboard]
-			#np.save(fileName, BoardMoveWeightDict)
-			return weightToReturn, tempboard
-
-		elif color == "Black":
-			for move in listOfMoves:
-				weight, tboard = minimaxAB(move, depth - 1, alpha, beta, "White")
-				##print(weight)
-				#minWeight = min(minWeight, weight)
-				if weight < minWeight:
-					##print('inside black if')
-					minWeight = weight
-					tempboard = move
-				beta = min(alpha, maxWeight)
-				if beta <= alpha:
-					break
-			# 		#print('changed tempboard to ')
-			# 		#print(tempboard)
-			# #print('returning from black ')
-			# #print(tempboard)
-			weightToReturn = minWeight
-			minWeight = 99999
-			BoardMoveWeightDictAB[(tuple(map(tuple, board)), depth, alpha, beta, color)] = [weightToReturn, tempboard]
-			#np.save(fileName, BoardMoveWeightDict)
-			return weightToReturn, tempboard
-
-### Trial section for minimax #########################################################################
-
-#board = []
-
-# def minimaxRoot(depth, board, isMaximizing):
-#     #possibleMoves = getAllAvailableMoves(tempboard, color)
-#     color = "White" if isMaximizing else "Black"
-#     possibleMoves = getAllAvailableMoves(board, color)
-#     bestMove = -9999
-#     secondBest = -9999
-#     thirdBest = -9999
-#     bestMoveFinal = None
-#     for move in possibleMoves:
-#         #board.append(move)
-#         value = max(bestMove, minimax(depth - 1, move, not isMaximizing))
-#         #board.pop()
-#         if( value > bestMove):
-#             #print("Best score: " ,str(bestMove))
-#             #print("Best move: ",str(bestMoveFinal))
-#             #print("Second best: ", str(secondBest))
-#             thirdBest = secondBest
-#             secondBest = bestMove
-#             bestMove = value
-#             bestMoveFinal = move
-#     return bestMoveFinal
-
-# def minimax(depth, board, is_maximizing):
-#     if(depth == 0):
-#         return -1 * calculateTotalWeight(board)
-#     color = "White" if is_maximizing else "Black"
-#     possibleMoves = getAllAvailableMoves(board, color)
-#     if(is_maximizing):
-#         bestMove = -9999
-#         for move in possibleMoves:
-#             #board.append(move)
-#             bestMove = max(bestMove,minimax(depth - 1, move, not is_maximizing))
-#             #board.pop()
-#         return bestMove
-#     else:
-#         bestMove = 9999
-#         for move in possibleMoves:
-#             #board.append(move)
-#             bestMove = min(bestMove, minimax(depth - 1, move, not is_maximizing))
-#             #board.pop()
-#         return bestMove
-
-### Trial section for minimax #########################################################################
 
 def convertToWeights(boardArray):
 	boardArrayNp = np.array(boardArray)
-	boardArrayNp[boardArrayNp == 3] = 50
-	boardArrayNp[boardArrayNp == 4] = -50
-	boardArrayNp[boardArrayNp == 5] = 30
-	boardArrayNp[boardArrayNp == 6] = -30
-	boardArrayNp[boardArrayNp == 7] = 30
-	boardArrayNp[boardArrayNp == 8] = -30
-	boardArrayNp[boardArrayNp == 9] = 90
-	boardArrayNp[boardArrayNp == 10] = -90
+	boardArrayNp[boardArrayNp == 3] = 300
+	boardArrayNp[boardArrayNp == 4] = -300
+	boardArrayNp[boardArrayNp == 5] = 200
+	boardArrayNp[boardArrayNp == 6] = -200
+	boardArrayNp[boardArrayNp == 7] = 150
+	boardArrayNp[boardArrayNp == 8] = -150
+	boardArrayNp[boardArrayNp == 9] = 500
+	boardArrayNp[boardArrayNp == 10] = -500
 	boardArrayNp[boardArrayNp == 11] = 900
 	boardArrayNp[boardArrayNp == 12] = -900
 	boardArrayNp[boardArrayNp == 1] = 10
@@ -2463,26 +3361,27 @@ def convertToWeights(boardArray):
 
 	return boardArrayNp
 
+
 def calculateTotalWeight(boardArray):
 	boardArray = convertToWeights(boardArray)
 	boardArrayNp = np.array(boardArray)
 	sum = 0
-	positionKingW = np.array([[-3.0, -3.0, -3.0, -3.0, -4.0, -1.0, 2.0, 2.0],
+	positionKingW = np.array([[-3.0, -3.0, -3.0, -3.0, -4.0, -1.0, 2.0, 2.0], 
 							  [-4.0, -4.0, -4.0, -4.0, -3.0, -2.0, 2.0, 3.0],
 							  [-4.0, -4.0, -4.0, -4.0, -3.0, -2.0, 0.0, 1.0],
 							  [-5.0, -5.0, -5.0, -5.0, -4.0, -2.0, 0.0, 0.0],
 							  [-5.0, -5.0, -5.0, -5.0, -4.0, -2.0, 0.0, 0.0],
 							  [-4.0, -4.0, -4.0, -4.0, -3.0, -2.0, 0.0, 1.0],
-							  [-4.0, -4.0, -4.0, -4.0, -3.0, -2.0, 2.0, 3.0],
+							  [-4.0, -4.0, -4.0, -4.0, -3.0, -2.0, 2.0, 3.0], 
 							  [-3.0, -3.0, -3.0, -3.0, -2.0, -1.0, 2.0, 2.0]])
 
-	positionKingB = np.array([[2.0, 2.0, -1.0, -2.0, -3.0, -3.0, -3.0, -3.0],
+	positionKingB = np.array([[2.0, 2.0, -1.0, -2.0, -3.0, -3.0, -3.0, -3.0], 
 							  [3.0, 2.0, -2.0, -3.0, -4.0, -4.0, -4.0, -4.0],
 							  [1.0, 2.0, -2.0, -3.0, -4.0, -4.0, -4.0, -4.0],
 							  [0.0, 2.0, -2.0, -4.0, -5.0, -5.0, -5.0, -5.0],
 							  [0.0, 2.0, -2.0, -4.0, -5.0, -5.0, -5.0, -5.0],
 							  [1.0, 2.0, -2.0, -3.0, -4.0, -4.0, -4.0, -4.0],
-							  [3.0, 2.0, -2.0, -3.0, -4.0, -4.0, -4.0, -4.0],
+							  [3.0, 2.0, -2.0, -3.0, -4.0, -4.0, -4.0, -4.0], 
 							  [2.0, 2.0, -1.0, -2.0, -3.0, -3.0, -3.0, -3.0]])
 
 
@@ -2492,7 +3391,7 @@ def calculateTotalWeight(boardArray):
 							   [-0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5],
 							   [-0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5],
 							   [-1.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -1.0],
-							   [-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0],
+							   [-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0], 
 							   [-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0]])
 
 	positionQueenB = np.array([[-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0],
@@ -2501,7 +3400,7 @@ def calculateTotalWeight(boardArray):
 							   [-0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5],
 							   [-0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5],
 							   [-1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.0, -1.0],
-							   [-1.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, -1.0],
+							   [-1.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, -1.0], 
 							   [-2.0, -1.0, -1.0, 0.0, -0.5, -1.0, -1.0, -2.0]])
 
 
@@ -2511,7 +3410,7 @@ def calculateTotalWeight(boardArray):
 							  [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5],
 							  [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5],
 							  [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-							  [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+							  [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 
 							  [0.0, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5, 0.0]])
 
 	positionRookB = np.array([[0.0, -0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.0],
@@ -2520,7 +3419,7 @@ def calculateTotalWeight(boardArray):
 							  [0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
 							  [0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
 							  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
-							  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+							  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0], 
 							  [0.0, -0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.0]])
 
 
@@ -2530,7 +3429,7 @@ def calculateTotalWeight(boardArray):
 							     [-1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, -1.5],
 							     [-1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, -1.5],
 							     [-1.0, 0.0, 0.5, 0.5, 1.0, 1.0, 0.0, -1.0],
-							     [-1.0, 0.0, 0.5, 0.5, 0.0, 1.0, 0.5, -1.0],
+							     [-1.0, 0.0, 0.5, 0.5, 0.0, 1.0, 0.5, -1.0], 
 							     [-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0]])
 
 	positionBishopeB = np.array([[-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0],
@@ -2539,7 +3438,7 @@ def calculateTotalWeight(boardArray):
 							     [-1.5, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, -1.5],
 							     [-1.5, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, -1.5],
 							     [-1.0, 0.0, 1.0, 1.0, 0.5, 0.5, 0.0, -1.0],
-							     [-1.0, 0.5, 1.0, 0.0, 0.5, 0.5, 0.0, -1.0],
+							     [-1.0, 0.5, 1.0, 0.0, 0.5, 0.5, 0.0, -1.0], 
 							     [-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0]])
 
 	positionKinghtW = np.array([[-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0],
@@ -2548,7 +3447,7 @@ def calculateTotalWeight(boardArray):
 							    [-3.0, 0.0, 1.5, 2.0, 2.0, 1.5, 0.5, -3.5],
 							    [-3.0, 0.0, 1.5, 2.0, 2.0, 1.5, 0.5, -3.5],
 							    [-3.0, 0.0, 1.0, 1.5, 1.5, 1.0, 0.0, -3.0],
-							    [-4.0, -2.0, 0.0, 0.5, 0.0, 0.5, -2.0, -4.0],
+							    [-4.0, -2.0, 0.0, 0.5, 0.0, 0.5, -2.0, -4.0], 
 							    [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0]])
 
 	positionKnightB = np.array([[-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0],
@@ -2557,7 +3456,7 @@ def calculateTotalWeight(boardArray):
 							    [-3.0, 0.5, 1.5, 2.0, 2.0, 1.5, 0.0, -3.0],
 							    [-3.0, 0.5, 1.5, 2.0, 2.0, 1.5, 0.0, -3.0],
 							    [-3.0, 0.0, 1.0, 1.5, 1.5, 1.0, 0.0, -3.0],
-							    [-4.0, -2.0, 0.5, 0.0, 0.5, 0.0, -2.0, -4.0],
+							    [-4.0, -2.0, 0.5, 0.0, 0.5, 0.0, -2.0, -4.0], 
 							    [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0]])
 
 
@@ -2567,7 +3466,7 @@ def calculateTotalWeight(boardArray):
 							  [0.0, 5.0, 3.0, 2.5, 2.0, 0.0, -2.0, 0.0],
 							  [0.0, 5.0, 3.0, 2.5, 2.0, 0.0, -2.0, 0.0],
 							  [0.0, 5.0, 2.0, 1.5, 0.0, -1.0, 1.0, 0.0],
-							  [0.0, 5.0, 1.0, 0.5, 0.0, -0.5, 1.0, 0.0],
+							  [0.0, 5.0, 1.0, 0.5, 0.0, -0.5, 1.0, 0.0], 
 							  [0.0, 5.0, 1.0, 0.5, 0.0, 0.5, 0.5, 0.0]])
 
 	positionPawnB = np.array([[0.0, 0.5, 0.5, 0.0, 0.5, 1.0, 5.0, 0.0],
@@ -2576,9 +3475,9 @@ def calculateTotalWeight(boardArray):
 							  [0.0, -2.0, 0.0, 2.0, 2.5, 3.0, 5.0, 0.0],
 							  [0.0, -2.0, 0.0, 2.0, 2.5, 3.0, 5.0, 0.0],
 							  [0.0, 1.0, -1.0, 0.0, 1.5, 2.0, 5.0, 0.0],
-							  [0.0, 1.0, -0.5, 0.0, 0.5, 1.0, 5.0, 0.0],
+							  [0.0, 1.0, -0.5, 0.0, 0.5, 1.0, 5.0, 0.0], 
 							  [0.0, 0.5, 0.5, 0.0, 0.5, 1.0, 5.0, 0.0]])
-
+	
 	positionDict = {
 					1 : positionPawnW,
 					2 : positionPawnB,
@@ -2616,7 +3515,7 @@ def board():
 				pt3 = Point(80+(i*80), 80+(160*j))
 				sq = Rectangle(pt2,pt3)
 				sq.setFill('grey')
-				sq.draw(win)
+				sq.draw(win)	
 		for i in range(8):
 			x = i%2
 			if x==1:
@@ -2640,7 +3539,7 @@ def board():
 		txt = Text(Point(40+(i*80),650),i+1)
 		txt.draw(win)
 	position()
-
+			
 def pawn(i,j,c):
 	pt4 = Point(40+(i*80), 40+(j*80))
 	pawn = Circle(pt4, 25)
@@ -2648,7 +3547,7 @@ def pawn(i,j,c):
 	if c%2 == 1:
 		pawn.setFill('white')
 	else:
-		pawn.setFill('black')
+		pawn.setFill('black')	
 	pawn.draw(win)
 
 def rook(i,j,c):
@@ -2660,7 +3559,7 @@ def rook(i,j,c):
 				   Point((i*80)+20, (j*80)+20),
 				   Point((i*80)+20, (j*80)+30),
 				   Point((i*80)+30, (j*80)+30),
-				   Point((i*80)+30, (j*80)+20),
+				   Point((i*80)+30, (j*80)+20),	
 				   Point((i*80)+50, (j*80)+20),
 				   Point((i*80)+50, (j*80)+30),
 				   Point((i*80)+60, (j*80)+30),
@@ -2772,6 +3671,6 @@ def position():
 			elif x[i][j] == 9 or x[i][j] == 10:
 				queen(i,j,x[i][j])
 			elif x[i][j] == 11 or x[i][j] == 12:
-				king(i,j,x[i][j])
+				king(i,j,x[i][j])						
 
 main()
