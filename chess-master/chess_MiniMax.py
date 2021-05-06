@@ -136,9 +136,9 @@ def main():
 	sq.setWidth(10)
 	sq.setOutline('yellow')
 	sq.draw(win)
-	txt4 = Text(Point(825,600), "White's move")
-	txt4.setSize(20)
-	txt4.draw(win)
+	# txt4 = Text(Point(825,600), "White's move")
+	# txt4.setSize(20)
+	# txt4.draw(win)
 
 	while checkmateW == 0 and checkmateB == 0:
 		
@@ -185,15 +185,15 @@ def main():
 		elif key == 'Return':
 			totalNodes = 0
 			if y[i][j] != 0:
-				txt4.undraw()
-				if count%2 == 0:
-					txt4 = Text(Point(825,600), "White's move")
-					txt4.setSize(20)
-					txt4.draw(win)
-				else:
-					txt4 = Text(Point(825,600), "Black's move")
-					txt4.setSize(20)
-					txt4.draw(win)
+				# txt4.undraw()
+				# if count%2 == 0:
+				# 	txt4 = Text(Point(825,600), "White's move")
+				# 	txt4.setSize(20)
+				# 	txt4.draw(win)
+				# else:
+				# 	txt4 = Text(Point(825,600), "Black's move")
+				# 	txt4.setSize(20)
+				# 	txt4.draw(win)
 				if y[i][j] == 1:
 					x[i][j] = piece
 				if y[i][j] == 2:
@@ -241,7 +241,7 @@ def main():
 				startTime = time.time()
 				
 				weight, boardMiniMax = minimax(x, 3, 'Black')
-				np.save(fileName, BoardMoveWeightDict)
+				# np.save(fileName, BoardMoveWeightDict)
 				x = boardMiniMax
 
 				#print('output from minimax is ')

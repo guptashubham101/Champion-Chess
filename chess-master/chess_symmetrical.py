@@ -2,24 +2,25 @@ from graphics import *
 import numpy as np
 import os
 import time
+import copy
 
-# x0 = [4,2,0,0,0,0,1,3]
-# x1 = [6,2,0,0,0,0,1,5]
-# x2 = [8,2,0,0,0,0,1,7]
-# x3 = [10,2,0,0,0,0,1,9]
-# x4 = [12,2,0,0,0,0,1,11]
-# x5 = [8,2,0,0,0,0,1,7]
-# x6 = [6,2,0,0,0,0,1,5]
-# x7 = [4,2,0,0,0,0,1,3]
+x0 = [4,2,0,0,0,0,1,3]
+x1 = [6,2,0,0,0,0,1,5]
+x2 = [8,2,0,0,0,0,1,7]
+x3 = [10,2,0,0,0,0,1,9]
+x4 = [12,2,0,0,0,0,1,11]
+x5 = [8,2,0,0,0,0,1,7]
+x6 = [6,2,0,0,0,0,1,5]
+x7 = [4,2,0,0,0,0,1,3]
 
-x0 = [0,0,0,0,0,0,0,0]
-x1 = [0,0,0,0,0,0,0,0]
-x2 = [0,0,0,0,0,0,0,0]
-x3 = [0,0,0,0,0,0,0,0]
-x4 = [0,2,0,11,0,0,8,0]
-x5 = [0,9,0,0,0,0,0,0]
-x6 = [0,0,0,0,0,0,0,0]
-x7 = [12,0,0,0,6,0,0,0]
+# x0 = [0,0,0,0,0,0,0,0]
+# x1 = [0,0,0,0,0,0,0,0]
+# x2 = [0,0,0,0,0,0,0,0]
+# x3 = [0,0,0,0,0,0,0,0]
+# x4 = [0,2,0,11,0,0,8,0]
+# x5 = [0,9,0,0,0,0,0,0]
+# x6 = [0,0,0,0,0,0,0,0]
+# x7 = [12,0,0,0,6,0,0,0]
 
 x = [x0,x1,x2,x3,x4,x5,x6,x7]
 
@@ -238,7 +239,7 @@ def main():
 				print("now*******")
 				startTime = time.time()
 				boardMiniMax = minimaxRootAB(3, x, False)
-				np.save(fileName, BoardWeightDictAB)
+				#np.save(fileName, BoardWeightDictAB)
 				x = boardMiniMax
 				
 
@@ -3181,7 +3182,29 @@ def blackCheck():
 		if g-p>-1 and h+p<8 and x[g-p][h+p]%2 == 1 and x[g-p][h+p] != 7 and x[g-p][h+p] != 9:
 			break
 	return isCheck
-	
+
+def getAllAvailableMovesOld(boardArray, color):
+	boardArrayNp = np.array(boardArray)
+	##print(boardArrayNp)
+	listOfBoards = []
+	for i in range(8):
+		for j in range(8):
+			if color == 'Black' and boardArrayNp[i][j] in [2,4,6,8,10,12]:
+				getAvailableDerived(boardArrayNp,i, j, 0, 0, 0, 0)
+			elif color == 'White' and boardArrayNp[i][j] in [1,3,5,7,9,11]:
+				getAvailableDerived(boardArrayNp,i, j, 0, 0, 0, 0)
+			piece = boardArrayNp[i][j]
+			for y_i in range(8):
+				for y_j in range(8):
+					boardArrayCopy = boardArrayNp.copy()
+					if y[y_i][y_j] != 0:
+						boardArrayCopy[y_i][y_j] = piece
+						boardArrayCopy[i][j] = 0
+						y[y_i][y_j] = 0
+						listOfBoards.append(boardArrayCopy)
+
+	return listOfBoards
+
 def getAllAvailableMoves(boardArray, color):
 	boardArrayNp = np.array(boardArray)
 	listOfBoards = []
@@ -3198,6 +3221,26 @@ def getAllAvailableMoves(boardArray, color):
 					if y[y_i][y_j] == 1:
 						boardArrayCopy[y_i][y_j] = piece
 						boardArrayCopy[i][j] = 0
+						rotatedBoard = copy.deepcopy(boardArrayCopy)
+						n = 3
+						# while(n> 0):
+						# 	n = n - 1
+						# 	for p in range(8):
+						# 		for q in range(p,8):
+						# 			temp = rotatedBoard[p][q]
+						# 			rotatedBoard[p][q] = rotatedBoard[q][p]
+						# 			rotatedBoard[q][p] = temp
+						# 	for p in range(8):
+						# 		for q in range(0,4):
+						# 			temp = rotatedBoard[p][q]
+						# 			rotatedBoard[p][q] = rotatedBoard[p][8 - 1 - q]
+						# 			rotatedBoard[p][8 - 1 - q] = temp
+
+						# 	boardsVisited.append(rotatedBoard)
+
+						# print(rotatedBoard
+						# print(boardArrayCopy)
+
 						y[y_i][y_j] = 0
 						if color == 'Black':
 							checkIfValidSymmetry = True
@@ -3226,7 +3269,7 @@ def getAllAvailableMoves(boardArray, color):
 													isSymmetricalBoard = False
 													break
 									if isSymmetricalBoard:
-										boardArrayCopySymmetry = boardArrayNp.copy()
+										boardArrayCopySymmetry = copy.deepcopy(boardArrayNp)
 										boardArrayCopySymmetry[7-y_i][y_j] = piece
 										boardArrayCopySymmetry[7-i][j] = 0
 										# print(boardArrayCopySymmetry)
@@ -3270,7 +3313,7 @@ def getAllAvailableMoves(boardArray, color):
 													isSymmetricalBoard = False
 													break
 									if isSymmetricalBoard:
-										boardArrayCopySymmetry = boardArrayNp.copy()
+										boardArrayCopySymmetry = copy.deepcopy(boardArrayNp)
 										boardArrayCopySymmetry[7-y_i][y_j] = piece
 										boardArrayCopySymmetry[7-i][j] = 0
 										# print(boardArrayCopySymmetry)
