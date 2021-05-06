@@ -134,9 +134,9 @@ def main():
 	sq.setWidth(10)
 	sq.setOutline('yellow')
 	sq.draw(win)
-	txt4 = Text(Point(825,600), "White's move")
-	txt4.setSize(20)
-	txt4.draw(win)
+	# txt4 = Text(Point(825,600), "White's move")
+	# txt4.setSize(20)
+	# txt4.draw(win)
 
 	while checkmateW == 0 and checkmateB == 0:
 		key = win.getKey()
@@ -182,15 +182,15 @@ def main():
 				selected = 1
 		elif key == 'Return':
 			if y[i][j] != 0:
-				txt4.undraw()
-				if count%2 == 0:
-					txt4 = Text(Point(825,600), "White's move")
-					txt4.setSize(20)
-					txt4.draw(win)
-				else:
-					txt4 = Text(Point(825,600), "Black's move")
-					txt4.setSize(20)
-					txt4.draw(win)
+				# txt4.undraw()
+				# if count%2 == 0:
+				# 	txt4 = Text(Point(825,600), "White's move")
+				# 	txt4.setSize(20)
+				# 	txt4.draw(win)
+				# else:
+				# 	txt4 = Text(Point(825,600), "Black's move")
+				# 	txt4.setSize(20)
+				# 	txt4.draw(win)
 				if y[i][j] == 1:
 					x[i][j] = piece
 				if y[i][j] == 2:
@@ -234,7 +234,7 @@ def main():
 				print("now*******")
 				startTime = time.time()
 				boardMiniMax = minimaxRootAB(3, x, False)
-				np.save(fileName, BoardWeightDictAB)
+				# np.save(fileName, BoardWeightDictAB)
 				x = boardMiniMax
 
 				endTime = time.time()
@@ -3191,7 +3191,7 @@ def getAllAvailableMoves(boardArray, color):
 			for y_i in range(8):
 				for y_j in range(8):
 					boardArrayCopy = boardArrayNp.copy()
-					if y[y_i][y_j] != 0:
+					if y[y_i][y_j] == 1:
 						boardArrayCopy[y_i][y_j] = piece
 						boardArrayCopy[i][j] = 0
 						y[y_i][y_j] = 0
